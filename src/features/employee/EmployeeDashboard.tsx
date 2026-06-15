@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Profile, EmployeeDetails, Order } from '../../types/database';
 import { Card, CardContent } from '../../components/common/Card';
+import { Button } from '../../components/common/Button';
 import { db } from '../../store/MockDatabase';
-import { Clock, MapPin, BriefcaseMedical, CheckCircle } from 'lucide-react';
+import { Clock, MapPin, BriefcaseMedical, CheckCircle, History } from 'lucide-react';
 
 interface Props {
   user: Profile;
@@ -10,18 +11,25 @@ interface Props {
 }
 
 export function EmployeeDashboard({ user, details }: Props) {
-  const [assignedJobs, setAssignedJobs] = useState<Order[]>([]);
+  const [jobs, setJobs] = useState<Order[]>([]);
+  const [view, setView] = useState<'active' | 'history'>('active');
 
   const fetchJobs = async () => {
-    const jobs = await db.getOrdersByEmployee(user.id);
-    setAssignedJobs(jobs);
+    const fetchedJobs = await db.getOrdersByEmployee(user.id);
+    setJobs(fetchedJobs);
   };
 
   useEffect(() => {
     fetchJobs();
-    const interval = setInterval(fetchJobs, 3000); // Poll for mock push notification
+    const interval = setInterval(fetchJobs, 3000); 
     return () => clearInterval(interval);
   }, [user.id]);
+
+  const handleMarkCompleted = async (orderId: string, customerId: string) => {
+    await db.markOrderCompleted(orderId);
+    await db.createNotification("Job Completed", "Your assigned employee has completed the service.", "customer", customerId);
+    fetchJobs();
+  };
 
   if (details.kyc_status === 'pending') {
     return (
@@ -45,12 +53,16 @@ export function EmployeeDashboard({ user, details }: Props) {
     );
   }
 
+  const activeJobs = jobs.filter(j => j.order_status === 'assigned');
+  const completedJobs = jobs.filter(j => j.order_status === 'completed');
+  const displayedJobs = view === 'active' ? activeJobs : completedJobs;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Your Assigned Jobs</h2>
-          <p className="text-slate-500">Currently managing {assignedJobs.length} active assignments.</p>
+          <h2 className="text-2xl font-bold text-slate-900">Your Assignments</h2>
+          <p className="text-slate-500">Currently managing {activeJobs.length} active jobs.</p>
         </div>
         <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-full font-medium text-sm">
           <CheckCircle className="w-4 h-4" />
@@ -58,14 +70,41 @@ export function EmployeeDashboard({ user, details }: Props) {
         </div>
       </div>
 
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-3 flex justify-around items-center z-50 pb-safe">
+        <button 
+          onClick={() => setView('active')}
+          className={`flex flex-col items-center gap-1 ${view === 'active' ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}
+        >
+          <div className="relative">
+            <Clock className="w-6 h-6" />
+            {activeJobs.length > 0 && <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />}
+          </div>
+          <span className="text-xs font-medium">Active Jobs</span>
+        </button>
+        
+        <button 
+          onClick={() => setView('history')}
+          className={`flex flex-col items-center gap-1 ${view === 'history' ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}
+        >
+          <History className="w-6 h-6" />
+          <span className="text-xs font-medium">History</span>
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {assignedJobs.length === 0 ? (
+        {displayedJobs.length === 0 ? (
           <div className="col-span-full p-12 text-center text-slate-500 bg-slate-50 rounded-2xl border border-slate-200 border-dashed">
-            No active jobs assigned to you right now.
+            {view === 'active' ? 'No active jobs assigned to you right now.' : 'You have not completed any jobs yet.'}
           </div>
         ) : (
-          assignedJobs.map((job) => (
-            <Card key={job.id} className="border-emerald-100 shadow-sm hover:shadow-md transition-shadow">
+          displayedJobs.map((job) => (
+            <Card key={job.id} className="border-emerald-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+              {job.order_status === 'completed' && (
+                <div className="absolute top-0 right-0 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                  COMPLETED
+                </div>
+              )}
               <CardContent className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -79,14 +118,20 @@ export function EmployeeDashboard({ user, details }: Props) {
                   </div>
                 </div>
                 
-                <div className="space-y-3 mt-4 pt-4 border-t border-slate-100">
+                <div className="space-y-4 mt-4 pt-4 border-t border-slate-100">
                   <div className="flex items-start gap-3">
                     <MapPin className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
                     <div>
                       <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Customer Location</p>
-                      <p className="text-sm font-medium text-slate-900 mt-0.5">Fetching Address... (Ref: {job.customer_id.substring(0, 8)})</p>
+                      <p className="text-sm font-medium text-slate-900 mt-0.5">Ref: {job.customer_id.substring(0, 8)}</p>
                     </div>
                   </div>
+                  
+                  {job.order_status === 'assigned' && (
+                    <Button fullWidth className="bg-emerald-600 hover:bg-emerald-700" onClick={() => handleMarkCompleted(job.id, job.customer_id)}>
+                      Mark as Completed
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>

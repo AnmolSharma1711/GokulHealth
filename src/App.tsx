@@ -54,8 +54,11 @@ function BackButtonHandler() {
   return null;
 }
 
+import { useNotifications } from './hooks/useNotifications';
+
 function AppRoutes() {
   const { session, isLoading } = useAuth();
+  useNotifications();
 
   if (isLoading) {
     return (

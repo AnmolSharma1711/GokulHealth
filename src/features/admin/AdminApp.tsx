@@ -64,10 +64,12 @@ export function AdminApp() {
     fetchData();
   };
 
-  const handleSendNotification = (e: React.FormEvent) => {
+  const handleSendNotification = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!notifTitle || !notifBody) return;
-    alert(`Push Notification Sent to ${notifTarget}:\nTitle: ${notifTitle}\nBody: ${notifBody}`);
+    
+    await db.createNotification(notifTitle, notifBody, notifTarget);
+    alert(`Notification broadcasted successfully!`);
     setNotifTitle('');
     setNotifBody('');
   };

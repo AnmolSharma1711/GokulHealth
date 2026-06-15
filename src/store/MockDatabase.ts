@@ -130,6 +130,44 @@ export class RealDatabase {
       ...d.employee_details
     }));
   }
+  // --- Notifications ---
+  async createNotification(title: string, body: string, targetRole: string, targetUserId: string | null = null): Promise<void> {
+    const { error } = await supabase.from('notifications').insert([{
+      title, body, target_role: targetRole, target_user_id: targetUserId
+    }]);
+    if (error) console.error("Notification Error:", error.message);
+  }
+
+  async getNotificationsForUser(userId: string, role: string): Promise<any[]> {
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .or(`target_role.eq.all,target_role.eq.${role},target_user_id.eq.${userId}`)
+      .order('created_at', { ascending: false });
+    
+    if (error) return [];
+    return data;
+  }
+
+  async markNotificationAsRead(notificationId: string, userId: string): Promise<void> {
+    // Fetch current read_by array
+    const { data } = await supabase.from('notifications').select('read_by').eq('id', notificationId).single();
+    if (data) {
+      const readBy = data.read_by || [];
+      if (!readBy.includes(userId)) {
+        await supabase.from('notifications').update({ read_by: [...readBy, userId] }).eq('id', notificationId);
+      }
+    }
+  }
+
+  // --- Orders ---
+  async markOrderCompleted(orderId: string): Promise<void> {
+    const { error } = await supabase
+      .from('orders')
+      .update({ order_status: 'completed' })
+      .eq('id', orderId);
+    if (error) throw new Error(error.message);
+  }
 }
 
 export const db = new RealDatabase();

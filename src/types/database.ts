@@ -41,3 +41,13 @@ export interface Order {
   order_status: OrderStatus;
   created_at: string;
 }
+
+export interface Notification {
+  id: string;
+  target_role: 'all' | 'customer' | 'employee' | 'admin' | string;
+  target_user_id: string | null;
+  title: string;
+  body: string;
+  read_by: string[];
+  created_at: string;
+}
