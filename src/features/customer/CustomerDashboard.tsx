@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Profile, CustomerDetails, Order } from '../../types/database';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
@@ -18,7 +18,7 @@ const SERVICES = [
   { id: 'hospital_bed', title: 'Hospital Bed (Motorized)', basePrice: 6000, icon: ShieldCheck },
 ];
 
-export function CustomerDashboard({ user, details }: Props) {
+export function CustomerDashboard({ user }: Props) {
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [durationMonths, setDurationMonths] = useState<number>(1);
   const [isBooking, setIsBooking] = useState(false);

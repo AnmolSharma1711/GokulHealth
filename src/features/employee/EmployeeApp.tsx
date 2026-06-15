@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { EmployeeAuth } from './EmployeeAuth';
 import { EmployeeKYCSetup } from './EmployeeKYCSetup';
 import { EmployeeDashboard } from './EmployeeDashboard';

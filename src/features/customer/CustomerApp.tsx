@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { CustomerAuth } from './CustomerAuth';
 import { CustomerProfileSetup } from './CustomerProfileSetup';
 import { CustomerDashboard } from './CustomerDashboard';

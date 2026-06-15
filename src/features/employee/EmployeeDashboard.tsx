@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Profile, EmployeeDetails, Order } from '../../types/database';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/common/Card';
+import { Card, CardContent } from '../../components/common/Card';
 import { db } from '../../store/MockDatabase';
 import { Clock, MapPin, BriefcaseMedical, CheckCircle } from 'lucide-react';
 
