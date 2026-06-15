@@ -21,6 +21,12 @@ export class RealDatabase {
     return data as Profile;
   }
 
+  async getProfileById(id: string): Promise<Profile | null> {
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', id).single();
+    if (error) return null;
+    return data as Profile;
+  }
+
   async registerProfile(profile: Profile): Promise<void> {
     const { error } = await supabase.from('profiles').insert([profile]);
     if (error) throw new Error(error.message);

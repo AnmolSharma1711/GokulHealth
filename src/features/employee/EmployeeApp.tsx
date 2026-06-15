@@ -2,29 +2,30 @@ import { useState, useEffect } from 'react';
 import { EmployeeAuth } from './EmployeeAuth';
 import { EmployeeKYCSetup } from './EmployeeKYCSetup';
 import { EmployeeDashboard } from './EmployeeDashboard';
-import { Profile, EmployeeDetails } from '../../types/database';
+import { EmployeeDetails } from '../../types/database';
 import { db } from '../../store/MockDatabase';
+import { useAuth } from '../../context/AuthContext';
 
 export function EmployeeApp() {
-  const [user, setUser] = useState<Profile | null>(null);
+  const { user, login, logout } = useAuth();
   const [details, setDetails] = useState<EmployeeDetails | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false);
 
   useEffect(() => {
     if (user && user.name && user.address) {
-      setIsLoading(true);
+      setIsDetailsLoading(true);
       db.getEmployeeDetails(user.id).then(d => {
         setDetails(d);
-        setIsLoading(false);
+        setIsDetailsLoading(false);
       });
     }
   }, [user]);
 
   if (!user) {
-    return <EmployeeAuth onLogin={setUser} />;
+    return <EmployeeAuth onLogin={login} />;
   }
 
-  const needsKYCSetup = !user.name || !user.address || (!details && !isLoading);
+  const needsKYCSetup = !user.name || !user.address || !details;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -32,8 +33,8 @@ export function EmployeeApp() {
         <h1 className="text-xl font-bold text-emerald-600">Employee Portal</h1>
         <button 
           onClick={() => {
-            setUser(null);
             setDetails(null);
+            logout();
           }}
           className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
         >
@@ -43,11 +44,15 @@ export function EmployeeApp() {
       
       <main className="flex-1 p-6">
         <div className="max-w-5xl mx-auto">
-          {needsKYCSetup ? (
+          {isDetailsLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+            </div>
+          ) : needsKYCSetup ? (
             <EmployeeKYCSetup 
               user={user} 
               onComplete={(updatedUser, newDetails) => {
-                setUser(updatedUser);
+                login(updatedUser);
                 setDetails(newDetails);
               }} 
             />

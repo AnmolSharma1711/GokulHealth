@@ -2,29 +2,30 @@ import { useState, useEffect } from 'react';
 import { CustomerAuth } from './CustomerAuth';
 import { CustomerProfileSetup } from './CustomerProfileSetup';
 import { CustomerDashboard } from './CustomerDashboard';
-import { Profile, CustomerDetails } from '../../types/database';
+import { CustomerDetails } from '../../types/database';
 import { db } from '../../store/MockDatabase';
+import { useAuth } from '../../context/AuthContext';
 
 export function CustomerApp() {
-  const [user, setUser] = useState<Profile | null>(null);
+  const { user, login, logout } = useAuth();
   const [details, setDetails] = useState<CustomerDetails | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false);
 
   useEffect(() => {
     if (user && user.name && user.address) {
-      setIsLoading(true);
+      setIsDetailsLoading(true);
       db.getCustomerDetails(user.id).then(d => {
         setDetails(d);
-        setIsLoading(false);
+        setIsDetailsLoading(false);
       });
     }
   }, [user]);
 
   if (!user) {
-    return <CustomerAuth onLogin={setUser} />;
+    return <CustomerAuth onLogin={login} />;
   }
 
-  const needsProfileSetup = !user.name || !user.address || (!details && !isLoading);
+  const needsProfileSetup = !user.name || !user.address || !details;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -32,8 +33,8 @@ export function CustomerApp() {
         <h1 className="text-xl font-bold text-primary-600">Customer Portal</h1>
         <button 
           onClick={() => {
-            setUser(null);
             setDetails(null);
+            logout();
           }}
           className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
         >
@@ -43,11 +44,15 @@ export function CustomerApp() {
       
       <main className="flex-1 p-6">
         <div className="max-w-5xl mx-auto">
-          {needsProfileSetup ? (
+          {isDetailsLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+            </div>
+          ) : needsProfileSetup ? (
             <CustomerProfileSetup 
               user={user} 
               onComplete={(updatedUser, newDetails) => {
-                setUser(updatedUser);
+                login(updatedUser);
                 setDetails(newDetails);
               }} 
             />

@@ -1,73 +1,115 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { App as CapacitorApp } from '@capacitor/app';
 import { CustomerApp } from './features/customer/CustomerApp';
 import { EmployeeApp } from './features/employee/EmployeeApp';
 import { AdminApp } from './features/admin/AdminApp';
-import { Shield, User, Briefcase, LayoutDashboard } from 'lucide-react';
+import { LandingPage } from './features/auth/LandingPage';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
-type ViewMode = 'switcher' | 'customer' | 'employee' | 'admin';
-
-function App() {
-  const [currentView, setCurrentView] = useState<ViewMode>('switcher');
-
-  if (currentView === 'switcher') {
+function RequireAuth({ role, children }: { role: 'customer' | 'employee' | 'admin', children: JSX.Element }) {
+  const { session, isLoading } = useAuth();
+  
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="max-w-4xl w-full">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">Booking Ecosystem</h1>
-            <p className="text-lg text-slate-600">Select a portal to preview the interface</p>
-          </div>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+      </div>
+    );
+  }
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <button
-              onClick={() => setCurrentView('customer')}
-              className="group relative bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-primary-500 transition-all duration-300 text-left overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
-              <User className="w-10 h-10 text-primary-600 mb-6 relative z-10" />
-              <h2 className="text-2xl font-semibold text-slate-900 mb-2 relative z-10">Customer App</h2>
-              <p className="text-slate-500 relative z-10">Mobile interface for booking services, devices, and managing orders.</p>
-            </button>
+  // Allow passing through to the auth screens if not logged in
+  // Wait, if we use RequireAuth, we should let the App component handle its own auth screens.
+  // Actually, let's just use the router to protect the routes. 
+  // Wait, the user said "login screens should be different".
+  // So CustomerApp has CustomerAuth inside it. If session is empty, CustomerApp shows CustomerAuth.
+  // If session is NOT empty but role doesn't match, we should redirect them to their actual role.
+  if (session && session.role !== role) {
+    return <Navigate to={`/${session.role}`} replace />;
+  }
 
-            <button
-              onClick={() => setCurrentView('employee')}
-              className="group relative bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-emerald-500 transition-all duration-300 text-left overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
-              <Briefcase className="w-10 h-10 text-emerald-600 mb-6 relative z-10" />
-              <h2 className="text-2xl font-semibold text-slate-900 mb-2 relative z-10">Employee App</h2>
-              <p className="text-slate-500 relative z-10">Mobile interface for receiving jobs, KYC onboarding, and status tracking.</p>
-            </button>
+  return children;
+}
 
-            <button
-              onClick={() => setCurrentView('admin')}
-              className="group relative bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-indigo-500 transition-all duration-300 text-left overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
-              <Shield className="w-10 h-10 text-indigo-600 mb-6 relative z-10" />
-              <h2 className="text-2xl font-semibold text-slate-900 mb-2 relative z-10">Admin Dashboard</h2>
-              <p className="text-slate-500 relative z-10">Desktop interface for matching orders, verifying KYC, and sending notifications.</p>
-            </button>
-          </div>
-        </div>
+function BackButtonHandler() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const listenToBackButton = async () => {
+      await CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+        if (canGoBack) {
+          navigate(-1);
+        } else {
+          CapacitorApp.exitApp();
+        }
+      });
+    };
+    
+    listenToBackButton();
+    return () => {
+      CapacitorApp.removeAllListeners();
+    };
+  }, [navigate]);
+
+  return null;
+}
+
+function AppRoutes() {
+  const { session, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 relative">
-      <button
-        onClick={() => setCurrentView('switcher')}
-        className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white p-3 rounded-full shadow-lg hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 pr-5"
-      >
-        <LayoutDashboard className="w-5 h-5" />
-        <span className="font-medium text-sm">Switch View</span>
-      </button>
+    <BrowserRouter>
+      <BackButtonHandler />
+      <Routes>
+        <Route 
+          path="/" 
+          element={
+            session ? <Navigate to={`/${session.role}`} replace /> : <LandingPage />
+          } 
+        />
+        <Route 
+          path="/customer/*" 
+          element={
+            <RequireAuth role="customer">
+              <CustomerApp />
+            </RequireAuth>
+          } 
+        />
+        <Route 
+          path="/employee/*" 
+          element={
+            <RequireAuth role="employee">
+              <EmployeeApp />
+            </RequireAuth>
+          } 
+        />
+        <Route 
+          path="/admin/*" 
+          element={
+            <RequireAuth role="admin">
+              <AdminApp />
+            </RequireAuth>
+          } 
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
 
-      {currentView === 'customer' && <CustomerApp />}
-      {currentView === 'employee' && <EmployeeApp />}
-      {currentView === 'admin' && <AdminApp />}
-    </div>
+function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   );
 }
 

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Users, Inbox, Bell, LayoutDashboard } from 'lucide-react';
+import { Shield, Users, Inbox, Bell, LayoutDashboard, LogOut } from 'lucide-react';
 import { db } from '../../store/MockDatabase';
 import { Order, Profile, EmployeeDetails } from '../../types/database';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
+import { useAuth } from '../../context/AuthContext';
+import { AdminAuth } from './AdminAuth';
 
 type Tab = 'overview' | 'matching' | 'employees' | 'notifications';
 
 export function AdminApp() {
+  const { user, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('matching');
   const [unassignedOrders, setUnassignedOrders] = useState<Order[]>([]);
   const [verifiedEmployees, setVerifiedEmployees] = useState<(Profile & EmployeeDetails)[]>([]);
@@ -19,6 +22,7 @@ export function AdminApp() {
   const [notifTarget, setNotifTarget] = useState('all');
 
   const fetchData = async () => {
+    if (!user) return;
     const orders = await db.getUnassignedOrders();
     const verified = await db.getVerifiedEmployees();
     const pending = await db.getPendingEmployees();
@@ -31,7 +35,11 @@ export function AdminApp() {
     fetchData();
     const interval = setInterval(fetchData, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user]);
+
+  if (!user) {
+    return <AdminAuth onLogin={login} />;
+  }
 
   const handleAssign = async (orderId: string, employeeId: string) => {
     await db.assignOrder(orderId, employeeId);
@@ -104,6 +112,16 @@ export function AdminApp() {
             <span className="font-medium">Global Notifications</span>
           </button>
         </nav>
+        
+        <div className="p-4 border-t border-indigo-800">
+          <button
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-indigo-200 hover:bg-red-500/20 hover:text-red-400"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Logout Admin</span>
+          </button>
+        </div>
       </aside>
 
       {/* Main Content Area */}
