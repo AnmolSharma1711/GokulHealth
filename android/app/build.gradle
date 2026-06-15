@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.booking.ecosystem"
+    namespace "com.gokul.janshayak"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.booking.ecosystem"
+        applicationId "com.gokul.janshayak"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

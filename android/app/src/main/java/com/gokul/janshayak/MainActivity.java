@@ -1,4 +1,4 @@
-package com.booking.ecosystem;
+package com.gokul.janshayak;
 
 import com.getcapacitor.BridgeActivity;
 

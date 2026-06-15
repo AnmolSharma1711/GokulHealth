@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.booking.ecosystem',
+  appId: 'com.gokul.janshayak',
   appName: 'Booking Ecosystem',
   webDir: 'dist'
 };
