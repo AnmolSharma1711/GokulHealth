@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { PushNotifications } from '@capacitor/push-notifications';
+import { Capacitor } from '@capacitor/core';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../store/MockDatabase';
 
@@ -10,10 +12,45 @@ export function useNotifications() {
   useEffect(() => {
     if (!user) return;
 
-    // Request permissions for Local Notifications
+    const setupPushNotifications = async () => {
+      if (Capacitor.getPlatform() === 'web') return;
+
+      try {
+        const result = await PushNotifications.requestPermissions();
+        if (result.receive === 'granted') {
+          await PushNotifications.register();
+        }
+
+        // Handle successful registration
+        PushNotifications.addListener('registration', (token) => {
+          console.log('Push registration success, token: ' + token.value);
+          db.savePushToken(user.id, token.value);
+        });
+
+        // Handle errors
+        PushNotifications.addListener('registrationError', (error) => {
+          console.error('Error on registration: ' + JSON.stringify(error));
+        });
+
+        // Handle notification received in foreground
+        PushNotifications.addListener('pushNotificationReceived', (notification) => {
+          console.log('Push received: ', notification);
+          // If app is open, maybe show an in-app alert or rely on LocalNotifications
+        });
+
+      } catch (e) {
+        console.error("Push notification setup failed:", e);
+      }
+    };
+
+    setupPushNotifications();
+
+    // -------------------------------------------------------------
+    // Local Polling Fallback (For Web / local testing without a backend server)
+    // -------------------------------------------------------------
     LocalNotifications.requestPermissions().then(result => {
       if (result.display === 'granted') {
-        console.log('Push notification permissions granted.');
+        console.log('Local notification permissions granted.');
       }
     });
 
@@ -25,24 +62,21 @@ export function useNotifications() {
           const isRead = notif.read_by && notif.read_by.includes(user.id);
           
           if (!isRead && !notifiedIds.current.has(notif.id)) {
-            // Trigger local push notification!
+            // Trigger local push notification
             LocalNotifications.schedule({
               notifications: [
                 {
                   title: notif.title,
                   body: notif.body,
-                  id: Math.floor(Math.random() * 100000), // Random ID for local display
-                  schedule: { at: new Date(Date.now() + 1000) }, // 1 sec from now
+                  id: Math.floor(Math.random() * 100000), 
+                  schedule: { at: new Date(Date.now() + 1000) },
                   actionTypeId: "",
                   extra: null
                 }
               ]
             });
 
-            // Mark as read in our local memory so we don't spam the user
             notifiedIds.current.add(notif.id);
-            
-            // Mark as read in the database
             db.markNotificationAsRead(notif.id, user.id);
           }
         });
@@ -51,10 +85,14 @@ export function useNotifications() {
       }
     };
 
-    // Check immediately and then every 10 seconds
     checkNotifications();
     const interval = setInterval(checkNotifications, 10000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (Capacitor.getPlatform() !== 'web') {
+        PushNotifications.removeAllListeners();
+      }
+    };
   }, [user]);
 }

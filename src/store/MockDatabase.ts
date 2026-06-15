@@ -168,6 +168,14 @@ export class RealDatabase {
       .eq('id', orderId);
     if (error) throw new Error(error.message);
   }
+  // --- Push Tokens ---
+  async savePushToken(userId: string, token: string): Promise<void> {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ push_token: token })
+      .eq('id', userId);
+    if (error) console.error("Error saving push token:", error.message);
+  }
 }
 
 export const db = new RealDatabase();
