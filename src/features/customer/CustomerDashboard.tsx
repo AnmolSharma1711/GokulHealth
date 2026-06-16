@@ -121,7 +121,7 @@ export function CustomerDashboard({ user }: Props) {
       },
     };
 
-    const rzp = new Razorpay(options);
+    const rzp = new Razorpay(options as any);
     
     rzp.on("payment.failed", function (response: any) {
       alert(`Payment Failed: ${response.error.description}`);
