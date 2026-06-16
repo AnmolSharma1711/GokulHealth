@@ -93,7 +93,11 @@ export function useNotifications() {
     return () => {
       clearInterval(interval);
       if (Capacitor.getPlatform() !== 'web') {
-        PushNotifications.removeAllListeners();
+        try {
+          PushNotifications.removeAllListeners();
+        } catch (err) {
+          console.error("Failed to remove push listeners", err);
+        }
       }
     };
   }, [user]);
