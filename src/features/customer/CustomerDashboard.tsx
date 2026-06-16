@@ -87,7 +87,6 @@ export function CustomerDashboard({ user }: Props) {
       currency: "INR",
       name: "JanSahayak",
       description: `Payment for ${pendingOrder.service_device_type}`,
-      order_id: "order_" + Math.random().toString(36).substring(2, 15), // Mock order_id for SDK validation
       handler: async (response: any) => {
         // Payment successful - Now we create the order in DB
         await db.createOrder(pendingOrder);
