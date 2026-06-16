@@ -25,6 +25,7 @@ export function AdminApp() {
   const [notifTitle, setNotifTitle] = useState('');
   const [notifBody, setNotifBody] = useState('');
   const [notifTarget, setNotifTarget] = useState('all');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const fetchData = async () => {
     if (!user) return;
@@ -120,8 +121,6 @@ export function AdminApp() {
       fetchData();
     }
   };
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
