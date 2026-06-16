@@ -48,11 +48,17 @@ export function useNotifications() {
     // -------------------------------------------------------------
     // Local Polling Fallback (For Web / local testing without a backend server)
     // -------------------------------------------------------------
-    LocalNotifications.requestPermissions().then(result => {
-      if (result.display === 'granted') {
-        console.log('Local notification permissions granted.');
+    const setupLocalNotifications = async () => {
+      try {
+        const result = await LocalNotifications.requestPermissions();
+        if (result.display === 'granted') {
+          console.log('Local notification permissions granted.');
+        }
+      } catch (e) {
+        console.error('Failed to request local notification permissions', e);
       }
-    });
+    };
+    setupLocalNotifications();
 
     const checkNotifications = async () => {
       try {
