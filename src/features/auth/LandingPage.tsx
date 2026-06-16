@@ -5,10 +5,10 @@ export function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 py-12 md:py-4">
       <div className="max-w-4xl w-full">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">Booking Ecosystem</h1>
+          <h1 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">JanSahayak</h1>
           <p className="text-lg text-slate-600">Please select your portal to login or register</p>
         </div>
 

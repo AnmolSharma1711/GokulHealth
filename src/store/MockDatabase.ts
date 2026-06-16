@@ -27,6 +27,20 @@ export class RealDatabase {
     return data as Profile;
   }
 
+  async getAdmins(): Promise<Profile[]> {
+    const { data } = await supabase.from('profiles').select('*').eq('role', 'admin');
+    return (data as Profile[]) || [];
+  }
+
+  async searchUserByPhone(phone: string): Promise<Profile | null> {
+    const { data } = await supabase.from('profiles').select('*').eq('phone_number', phone).single();
+    return (data as Profile) || null;
+  }
+
+  async updateUserRole(id: string, role: string): Promise<void> {
+    await supabase.from('profiles').update({ role }).eq('id', id);
+  }
+
   async registerProfile(profile: Profile): Promise<void> {
     const { error } = await supabase.from('profiles').insert([profile]);
     if (error) throw new Error(error.message);

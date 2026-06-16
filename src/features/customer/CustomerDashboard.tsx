@@ -68,20 +68,14 @@ export function CustomerDashboard({ user }: Props) {
       service_device_type: activeService.title,
       duration_months: durationMonths,
       locked_price: lockedPrice,
-      payment_status: 'pending',
+      payment_status: 'paid', // We'll save it as paid only after Razorpay succeeds
       order_status: 'unassigned',
       created_at: new Date().toISOString(),
     };
 
-    try {
-      await db.createOrder(newOrder);
-      setPendingOrder(newOrder);
-      setShowPayment(true);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsBooking(false);
-    }
+    setPendingOrder(newOrder);
+    setShowPayment(true);
+    setIsBooking(false);
   };
 
   const handleRazorpayPayment = () => {
@@ -91,15 +85,16 @@ export function CustomerDashboard({ user }: Props) {
       key: "rzp_test_T2DKoMwVosyxaj", // User provided test key
       amount: (pendingOrder.locked_price * 100).toString(), // amount in paise
       currency: "INR",
-      name: "Booking Ecosystem",
+      name: "JanSahayak",
       description: `Payment for ${pendingOrder.service_device_type}`,
+      order_id: "order_" + Math.random().toString(36).substring(2, 15), // Mock order_id for SDK validation
       handler: async (response: any) => {
-        // Payment successful
-        await db.updatePaymentStatus(pendingOrder.id, 'paid');
+        // Payment successful - Now we create the order in DB
+        await db.createOrder(pendingOrder);
         
         // Trigger push notification to customer
         await db.createNotification(
-          "Payment Received \u2705",
+          "Payment Received ✅",
           `Your payment of ₹${pendingOrder.locked_price.toLocaleString()} was successful. Your order is placed!`,
           'customer',
           user.id
@@ -111,6 +106,7 @@ export function CustomerDashboard({ user }: Props) {
         setSelectedService(null);
         setDurationMonths(1);
         setCurrentTab('orders');
+        fetchMyOrders();
       },
       prefill: {
         name: user.name || "Customer",
@@ -159,11 +155,11 @@ export function CustomerDashboard({ user }: Props) {
     return (
       <div className="space-y-8">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Book a Service or Device</h2>
-          <p className="text-slate-500 mt-1">Select what you need and lock in your price.</p>
+          <h2 className="text-xl font-bold text-slate-900">Book a Service or Device</h2>
+          <p className="text-sm text-slate-500 mt-1">Select what you need and lock in your price.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {SERVICES.map((service) => {
             const isSelected = selectedService === service.id;
             const Icon = service.icon;
@@ -171,58 +167,58 @@ export function CustomerDashboard({ user }: Props) {
               <button
                 key={service.id}
                 onClick={() => setSelectedService(service.id)}
-                className={`p-6 rounded-2xl border text-left transition-all ${
+                className={`p-4 rounded-xl border text-left transition-all flex flex-col items-start ${
                   isSelected 
                     ? 'border-primary-500 ring-2 ring-primary-500 ring-opacity-20 bg-primary-50 shadow-md' 
                     : 'border-slate-200 bg-white hover:border-primary-300 hover:shadow-sm'
                 }`}
               >
-                <Icon className={`w-8 h-8 mb-4 ${isSelected ? 'text-primary-600' : 'text-slate-400'}`} />
-                <h3 className="font-semibold text-slate-900">{service.title}</h3>
-                <p className="text-sm text-slate-500 mt-1">From ₹{service.basePrice.toLocaleString()}/mo</p>
+                <Icon className={`w-6 h-6 mb-3 ${isSelected ? 'text-primary-600' : 'text-slate-400'}`} />
+                <h3 className="font-semibold text-sm text-slate-900 leading-tight">{service.title}</h3>
+                <p className="text-xs text-slate-500 mt-1 font-medium">₹{service.basePrice.toLocaleString()}/mo</p>
               </button>
             );
           })}
         </div>
 
         {selectedService && activeService && (
-          <Card className="bg-gradient-to-br from-white to-slate-50 border-primary-100 shadow-lg">
-            <CardContent className="p-8">
-              <div className="grid md:grid-cols-2 gap-8 items-center">
+          <Card className="bg-gradient-to-br from-white to-slate-50 border-primary-100 shadow-sm rounded-xl overflow-hidden mt-4">
+            <CardContent className="p-5">
+              <div className="grid md:grid-cols-2 gap-6 items-center">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-primary-500" />
+                  <h3 className="text-base font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-primary-500" />
                     Select Duration
                   </h3>
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-3">
                     <input
                       type="range"
                       min="1"
                       max="12"
                       value={durationMonths}
                       onChange={(e) => setDurationMonths(parseInt(e.target.value))}
-                      className="w-full accent-primary-600"
+                      className="w-full accent-primary-600 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
                     />
-                    <div className="flex justify-between text-sm font-medium text-slate-500">
-                      <span>1 Month</span>
-                      <span className="text-primary-600 font-bold bg-primary-100 px-3 py-1 rounded-full">
+                    <div className="flex justify-between text-xs font-medium text-slate-500">
+                      <span>1 Mo</span>
+                      <span className="text-primary-600 font-bold bg-primary-100 px-2.5 py-0.5 rounded-full">
                         {durationMonths} Months
                       </span>
-                      <span>12 Months</span>
+                      <span>12 Mo</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                  <div className="flex justify-between items-end mb-4">
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-center">
+                  <div className="flex justify-between items-center mb-3">
                     <div>
-                      <p className="text-sm text-slate-500 font-medium">Locked Total Price</p>
-                      <p className="text-4xl font-bold text-slate-900 mt-1">
+                      <p className="text-xs text-slate-500 font-medium">Locked Price</p>
+                      <p className="text-2xl font-bold text-slate-900 leading-none">
                         ₹{lockedPrice.toLocaleString()}
                       </p>
                     </div>
                     {durationMonths >= 3 && (
-                      <div className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded-md mb-1">
+                      <div className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded-md">
                         {durationMonths >= 6 ? '15% OFF' : '10% OFF'}
                       </div>
                     )}
@@ -230,7 +226,7 @@ export function CustomerDashboard({ user }: Props) {
                   
                   <Button 
                     fullWidth 
-                    size="lg" 
+                    size="md" 
                     onClick={handleCreateOrder}
                     disabled={isBooking}
                   >

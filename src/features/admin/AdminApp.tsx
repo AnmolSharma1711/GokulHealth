@@ -7,7 +7,7 @@ import { Button } from '../../components/common/Button';
 import { useAuth } from '../../context/AuthContext';
 import { AdminAuth } from './AdminAuth';
 
-type Tab = 'overview' | 'matching' | 'employees' | 'notifications';
+type Tab = 'overview' | 'matching' | 'employees' | 'notifications' | 'system_admins';
 
 export function AdminApp() {
   const { user, login, logout } = useAuth();
@@ -15,6 +15,9 @@ export function AdminApp() {
   const [unassignedOrders, setUnassignedOrders] = useState<Order[]>([]);
   const [verifiedEmployees, setVerifiedEmployees] = useState<(Profile & EmployeeDetails)[]>([]);
   const [pendingEmployees, setPendingEmployees] = useState<(Profile & EmployeeDetails)[]>([]);
+  const [adminUsers, setAdminUsers] = useState<Profile[]>([]);
+  const [searchPhone, setSearchPhone] = useState('');
+  const [searchResult, setSearchResult] = useState<Profile | null>(null);
   
   // Notification State
   const [notifTitle, setNotifTitle] = useState('');
@@ -26,9 +29,11 @@ export function AdminApp() {
     const orders = await db.getUnassignedOrders();
     const verified = await db.getVerifiedEmployees();
     const pending = await db.getPendingEmployees();
+    const admins = await db.getAdmins();
     setUnassignedOrders(orders);
     setVerifiedEmployees(verified);
     setPendingEmployees(pending);
+    setAdminUsers(admins);
   };
 
   useEffect(() => {
@@ -94,6 +99,26 @@ export function AdminApp() {
     setNotifBody('');
   };
 
+  const handleSearchUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchPhone) return;
+    const user = await db.searchUserByPhone(searchPhone);
+    setSearchResult(user);
+    if (!user) {
+      alert('User not found with this phone number.');
+    }
+  };
+
+  const handleMakeAdmin = async (userId: string) => {
+    if (window.confirm('Are you sure you want to grant Admin privileges to this user?')) {
+      await db.updateUserRole(userId, 'admin');
+      alert('User successfully promoted to Admin!');
+      setSearchResult(null);
+      setSearchPhone('');
+      fetchData();
+    }
+  };
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
@@ -146,6 +171,13 @@ export function AdminApp() {
           >
             <Bell className="w-5 h-5" />
             <span className="font-medium">Global Notifications</span>
+          </button>
+          <button
+            onClick={() => { setActiveTab('system_admins'); setIsSidebarOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'system_admins' ? 'bg-indigo-800 text-white' : 'text-indigo-200 hover:bg-indigo-800/50 hover:text-white'}`}
+          >
+            <Shield className="w-5 h-5" />
+            <span className="font-medium">System Admins</span>
           </button>
         </nav>
         
@@ -200,13 +232,13 @@ export function AdminApp() {
 
         {/* ORDER MATCHING TAB */}
         {activeTab === 'matching' && (
-          <div className="h-[calc(100vh-4rem)] flex flex-col">
+          <div className="flex flex-col min-h-[calc(100vh-8rem)]">
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6 shrink-0">Employee-Order Matching</h2>
             
-            <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0 overflow-hidden">
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">
               
               {/* Unassigned Orders Panel */}
-              <div className="flex flex-col bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+              <div className="flex flex-col bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden h-[500px] lg:h-full">
                 <div className="p-4 border-b border-slate-100 bg-slate-50">
                   <h3 className="font-semibold text-slate-900 flex items-center justify-between">
                     Unassigned Orders
@@ -256,7 +288,7 @@ export function AdminApp() {
               </div>
 
               {/* Available Employees Panel */}
-              <div className="flex flex-col bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+              <div className="flex flex-col bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden h-[500px] lg:h-full">
                 <div className="p-4 border-b border-slate-100 bg-slate-50">
                   <h3 className="font-semibold text-slate-900 flex items-center justify-between">
                     Available Verified Employees
@@ -352,8 +384,8 @@ export function AdminApp() {
                       onChange={(e) => setNotifTarget(e.target.value)}
                     >
                       <option value="all">All Users (Customers & Employees)</option>
-                      <option value="customers">All Customers</option>
-                      <option value="employees">All Employees</option>
+                      <option value="customer">All Customers</option>
+                      <option value="employee">All Employees</option>
                       <option value="morning_shift">Employees (Morning Shift)</option>
                     </select>
                   </div>
@@ -384,6 +416,75 @@ export function AdminApp() {
                 </form>
               </CardContent>
             </Card>
+          </div>
+        )}
+
+        {/* SYSTEM ADMINS TAB */}
+        {activeTab === 'system_admins' && (
+          <div className="space-y-6 max-w-3xl">
+            <h2 className="text-3xl font-bold text-slate-900 mb-6">System Administrators</h2>
+            
+            {/* Search & Add Admin */}
+            <Card className="mb-8">
+              <CardHeader className="bg-indigo-50 border-b border-indigo-100">
+                <CardTitle className="text-indigo-900">Promote User to Admin</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <form onSubmit={handleSearchUser} className="flex gap-4 items-end mb-4">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Search by Phone Number</label>
+                    <input
+                      type="tel"
+                      className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="e.g. 9876543210"
+                      value={searchPhone}
+                      onChange={(e) => setSearchPhone(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 h-11 px-6">
+                    Search User
+                  </Button>
+                </form>
+
+                {searchResult && (
+                  <div className="mt-6 p-4 border border-emerald-200 bg-emerald-50 rounded-xl flex items-center justify-between">
+                    <div>
+                      <h4 className="font-bold text-emerald-900">{searchResult.name || 'Unnamed User'}</h4>
+                      <p className="text-sm text-emerald-700">Phone: {searchResult.phone_number}</p>
+                      <p className="text-xs font-medium text-emerald-600 mt-1 uppercase tracking-wide">Current Role: {searchResult.role}</p>
+                    </div>
+                    {searchResult.role !== 'admin' ? (
+                      <Button onClick={() => handleMakeAdmin(searchResult.id)} className="bg-emerald-600 hover:bg-emerald-700">
+                        Make Admin
+                      </Button>
+                    ) : (
+                      <span className="text-emerald-700 font-bold px-4">Already Admin</span>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* List Admins */}
+            <h3 className="text-xl font-bold text-slate-900 mb-4">Current Admins</h3>
+            <div className="grid gap-4">
+              {adminUsers.map(admin => (
+                <div key={admin.id} className="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4">
+                  <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-xl">
+                    {admin.name?.charAt(0) || 'A'}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900">{admin.name || 'Admin'}</h4>
+                    <p className="text-sm text-slate-500">{admin.phone_number}</p>
+                  </div>
+                  <Shield className="w-6 h-6 text-indigo-400 ml-auto" />
+                </div>
+              ))}
+              {adminUsers.length === 0 && (
+                <p className="text-slate-500 text-center py-8">No admins found.</p>
+              )}
+            </div>
           </div>
         )}
 
