@@ -144,6 +144,28 @@ export class RealDatabase {
       ...d.employee_details
     }));
   }
+
+  async getAllUsers(): Promise<Profile[]> {
+    const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+    return data || [];
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    await supabase.from('profiles').delete().eq('id', id);
+  }
+
+  async getAllOrders(): Promise<Order[]> {
+    const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+    return data || [];
+  }
+
+  async deleteOrder(id: string): Promise<void> {
+    await supabase.from('orders').delete().eq('id', id);
+  }
+
+  async deleteNotification(id: string): Promise<void> {
+    await supabase.from('notifications').delete().eq('id', id);
+  }
   // --- Notifications ---
   async createNotification(title: string, body: string, targetRole: string, targetUserId: string | null = null): Promise<void> {
     const { error } = await supabase.from('notifications').insert([{

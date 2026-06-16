@@ -3,7 +3,7 @@ import { Profile, EmployeeDetails, Order } from '../../types/database';
 import { Card, CardContent } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { db } from '../../store/MockDatabase';
-import { Clock, MapPin, BriefcaseMedical, CheckCircle, History } from 'lucide-react';
+import { Clock, MapPin, BriefcaseMedical, CheckCircle, History, Sparkles } from 'lucide-react';
 
 interface Props {
   user: Profile;
@@ -33,10 +33,13 @@ export function EmployeeDashboard({ user, details }: Props) {
 
   if (details.kyc_status === 'pending') {
     return (
-      <div className="max-w-2xl mx-auto mt-12 text-center p-8 bg-amber-50 rounded-2xl border border-amber-200">
-        <Clock className="w-16 h-16 text-amber-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-amber-900 mb-2">Verification Pending</h2>
-        <p className="text-amber-700">
+      <div className="max-w-2xl mx-auto mt-12 text-center p-10 glass-card bg-amber-50/80 rounded-3xl border border-amber-200/50 animate-fade-in-up">
+        <div className="w-24 h-24 bg-amber-100/50 rounded-full flex items-center justify-center mx-auto mb-6 relative">
+          <div className="absolute inset-0 border-4 border-amber-400 rounded-full border-t-transparent animate-spin"></div>
+          <Clock className="w-10 h-10 text-amber-500" />
+        </div>
+        <h2 className="text-3xl font-black text-amber-900 mb-3 tracking-tight">Verification Pending</h2>
+        <p className="text-amber-700/80 text-lg leading-relaxed">
           Your KYC documents have been submitted and are currently under review by our Admin team. 
           You will be notified once your profile is verified.
         </p>
@@ -46,9 +49,9 @@ export function EmployeeDashboard({ user, details }: Props) {
 
   if (details.kyc_status === 'rejected') {
     return (
-      <div className="max-w-2xl mx-auto mt-12 text-center p-8 bg-red-50 rounded-2xl border border-red-200">
-        <h2 className="text-2xl font-bold text-red-900 mb-2">Verification Rejected</h2>
-        <p className="text-red-700">Please contact support for more information.</p>
+      <div className="max-w-2xl mx-auto mt-12 text-center p-10 glass-card bg-red-50/80 rounded-3xl border border-red-200/50 animate-fade-in-up">
+        <h2 className="text-3xl font-black text-red-900 mb-3 tracking-tight">Verification Rejected</h2>
+        <p className="text-red-700/80 text-lg">Please contact support for more information.</p>
       </div>
     );
   }
@@ -58,77 +61,61 @@ export function EmployeeDashboard({ user, details }: Props) {
   const displayedJobs = view === 'active' ? activeJobs : completedJobs;
 
   return (
-    <div className="space-y-6 pb-24">
-      <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900">Your Assignments</h2>
-          <p className="text-slate-500">Currently managing {activeJobs.length} active jobs.</p>
-        </div>
-        <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-full font-medium text-sm">
-          <CheckCircle className="w-4 h-4" />
-          Verified Employee
-        </div>
-      </div>
-
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-3 flex justify-around items-center z-50 pb-safe">
-        <button 
-          onClick={() => setView('active')}
-          className={`flex flex-col items-center gap-1 ${view === 'active' ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}
-        >
-          <div className="relative">
-            <Clock className="w-6 h-6" />
-            {activeJobs.length > 0 && <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />}
+    <div className="space-y-8 pb-28">
+      <div className="glass p-8 rounded-3xl relative overflow-hidden animate-fade-in-up">
+        <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse-slow"></div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
+          <div>
+            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Your Assignments</h2>
+            <p className="text-slate-500 mt-1 text-lg">Currently managing <strong className="text-emerald-600">{activeJobs.length}</strong> active jobs.</p>
           </div>
-          <span className="text-xs font-medium">Active Jobs</span>
-        </button>
-        
-        <button 
-          onClick={() => setView('history')}
-          className={`flex flex-col items-center gap-1 ${view === 'history' ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}
-        >
-          <History className="w-6 h-6" />
-          <span className="text-xs font-medium">History</span>
-        </button>
+          <div className="flex items-center gap-2 text-emerald-700 bg-emerald-100/50 px-5 py-2.5 rounded-2xl font-bold text-sm backdrop-blur-sm border border-emerald-200/50 shadow-sm">
+            <CheckCircle className="w-5 h-5 text-emerald-500" />
+            Verified Employee
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
         {displayedJobs.length === 0 ? (
-          <div className="col-span-full p-12 text-center text-slate-500 bg-slate-50 rounded-2xl border border-slate-200 border-dashed">
-            {view === 'active' ? 'No active jobs assigned to you right now.' : 'You have not completed any jobs yet.'}
+          <div className="col-span-full p-16 text-center text-slate-500 glass-card rounded-3xl border border-slate-200/50 border-dashed">
+            <Sparkles className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+            <p className="text-lg font-medium">{view === 'active' ? 'No active jobs assigned to you right now.' : 'You have not completed any jobs yet.'}</p>
           </div>
         ) : (
           displayedJobs.map((job) => (
-            <Card key={job.id} className="border-emerald-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+            <Card key={job.id} className="glass-card border-emerald-100/50 hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300 relative overflow-hidden group hover:-translate-y-1">
               {job.order_status === 'completed' && (
-                <div className="absolute top-0 right-0 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] uppercase tracking-wider font-black px-4 py-1.5 rounded-bl-2xl shadow-sm z-10">
                   COMPLETED
                 </div>
               )}
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start mb-4">
+              <CardContent className="p-8">
+                <div className="flex justify-between items-start mb-6">
                   <div>
-                    <h3 className="font-bold text-lg text-slate-900">{job.service_device_type}</h3>
-                    <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700">
+                    <h3 className="font-bold text-xl text-slate-900 mb-2">{job.service_device_type}</h3>
+                    <span className="inline-block px-3 py-1 rounded-xl text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
                       Duration: {job.duration_months} Months
                     </span>
                   </div>
-                  <div className="bg-emerald-50 p-2 rounded-lg">
+                  <div className="bg-emerald-50 p-3 rounded-2xl group-hover:scale-110 transition-transform duration-300">
                     <BriefcaseMedical className="w-6 h-6 text-emerald-600" />
                   </div>
                 </div>
                 
-                <div className="space-y-4 mt-4 pt-4 border-t border-slate-100">
-                  <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
+                <div className="space-y-6 mt-6 pt-6 border-t border-slate-100/50 relative">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-slate-50 p-2 rounded-xl mt-0.5">
+                      <MapPin className="w-5 h-5 text-slate-400" />
+                    </div>
                     <div>
-                      <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Customer Location</p>
-                      <p className="text-sm font-medium text-slate-900 mt-0.5">Ref: {job.customer_id.substring(0, 8)}</p>
+                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Customer Reference</p>
+                      <p className="text-base font-medium text-slate-900 mt-1">{job.customer_id.substring(0, 8).toUpperCase()}</p>
                     </div>
                   </div>
                   
                   {job.order_status === 'assigned' && (
-                    <Button fullWidth className="bg-emerald-600 hover:bg-emerald-700" onClick={() => handleMarkCompleted(job.id, job.customer_id)}>
+                    <Button fullWidth size="lg" className="bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 py-6 text-lg rounded-2xl" onClick={() => handleMarkCompleted(job.id, job.customer_id)}>
                       Mark as Completed
                     </Button>
                   )}
@@ -137,6 +124,30 @@ export function EmployeeDashboard({ user, details }: Props) {
             </Card>
           ))
         )}
+      </div>
+
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-white/50 px-6 pt-4 flex justify-around items-center z-50 pb-safe shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] rounded-t-3xl">
+        <button 
+          onClick={() => setView('active')}
+          className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${view === 'active' ? 'text-emerald-600 transform -translate-y-1' : 'text-slate-400 hover:text-slate-600'}`}
+        >
+          <div className={`relative p-2 rounded-xl ${view === 'active' ? 'bg-emerald-50' : ''}`}>
+            <Clock className="w-6 h-6" />
+            {activeJobs.length > 0 && <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white shadow-sm animate-pulse" />}
+          </div>
+          <span className="text-[11px] font-bold uppercase tracking-wider">Active Jobs</span>
+        </button>
+        
+        <button 
+          onClick={() => setView('history')}
+          className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${view === 'history' ? 'text-emerald-600 transform -translate-y-1' : 'text-slate-400 hover:text-slate-600'}`}
+        >
+          <div className={`p-2 rounded-xl ${view === 'history' ? 'bg-emerald-50' : ''}`}>
+            <History className="w-6 h-6" />
+          </div>
+          <span className="text-[11px] font-bold uppercase tracking-wider">History</span>
+        </button>
       </div>
     </div>
   );

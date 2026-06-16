@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Users, Inbox, Bell, LayoutDashboard, LogOut } from 'lucide-react';
+import { Shield, Users, Inbox, Bell, LayoutDashboard, LogOut, Database, Trash2 } from 'lucide-react';
 import { db } from '../../store/MockDatabase';
 import { Order, Profile, EmployeeDetails } from '../../types/database';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/common/Card';
@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { AdminAuth } from './AdminAuth';
 import { useNavigate } from 'react-router-dom';
 
-type Tab = 'overview' | 'matching' | 'employees' | 'notifications' | 'system_admins';
+type Tab = 'overview' | 'matching' | 'employees' | 'notifications' | 'system_admins' | 'database';
 
 export function AdminApp() {
   const { user, login, logout } = useAuth();
@@ -20,6 +20,9 @@ export function AdminApp() {
   const [adminUsers, setAdminUsers] = useState<Profile[]>([]);
   const [searchPhone, setSearchPhone] = useState('');
   const [searchResult, setSearchResult] = useState<Profile | null>(null);
+  
+  const [allUsers, setAllUsers] = useState<Profile[]>([]);
+  const [allOrders, setAllOrders] = useState<Order[]>([]);
   
   // Notification State
   const [notifTitle, setNotifTitle] = useState('');
@@ -33,10 +36,15 @@ export function AdminApp() {
     const verified = await db.getVerifiedEmployees();
     const pending = await db.getPendingEmployees();
     const admins = await db.getAdmins();
+    const users = await db.getAllUsers();
+    const allOrds = await db.getAllOrders();
+    
     setUnassignedOrders(orders);
     setVerifiedEmployees(verified);
     setPendingEmployees(pending);
     setAdminUsers(admins);
+    setAllUsers(users);
+    setAllOrders(allOrds);
   };
 
   useEffect(() => {
@@ -179,6 +187,13 @@ export function AdminApp() {
           >
             <Shield className="w-5 h-5" />
             <span className="font-medium">System Admins</span>
+          </button>
+          <button
+            onClick={() => { setActiveTab('database'); setIsSidebarOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'database' ? 'bg-indigo-800 text-white' : 'text-indigo-200 hover:bg-indigo-800/50 hover:text-white'}`}
+          >
+            <Database className="w-5 h-5" />
+            <span className="font-medium">Database DB</span>
           </button>
         </nav>
         
@@ -485,6 +500,109 @@ export function AdminApp() {
               {adminUsers.length === 0 && (
                 <p className="text-slate-500 text-center py-8">No admins found.</p>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* DATABASE TAB */}
+        {activeTab === 'database' && (
+          <div className="space-y-6">
+            <h2 className="text-3xl font-bold text-slate-900 mb-6">Database Management</h2>
+            
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Users Table */}
+              <Card className="glass-card overflow-hidden">
+                <CardHeader className="bg-indigo-50/50 border-b border-indigo-100/50 backdrop-blur-md">
+                  <CardTitle className="text-indigo-900 flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    All Users
+                  </CardTitle>
+                </CardHeader>
+                <div className="overflow-x-auto max-h-[500px]">
+                  <table className="w-full text-sm text-left">
+                    <thead className="text-xs text-slate-500 bg-slate-50/50 sticky top-0 uppercase">
+                      <tr>
+                        <th className="px-4 py-3">Phone</th>
+                        <th className="px-4 py-3">Role</th>
+                        <th className="px-4 py-3 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allUsers.map((u) => (
+                        <tr key={u.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                          <td className="px-4 py-3 font-medium text-slate-900">{u.phone_number}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : u.role === 'employee' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
+                              {u.role}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            {u.id !== user.id && (
+                              <button 
+                                onClick={async () => {
+                                  if (window.confirm('Delete this user permanently?')) {
+                                    await db.deleteUser(u.id);
+                                    fetchData();
+                                  }
+                                }}
+                                className="text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+
+              {/* Orders Table */}
+              <Card className="glass-card overflow-hidden">
+                <CardHeader className="bg-emerald-50/50 border-b border-emerald-100/50 backdrop-blur-md">
+                  <CardTitle className="text-emerald-900 flex items-center gap-2">
+                    <Inbox className="w-5 h-5" />
+                    All Orders
+                  </CardTitle>
+                </CardHeader>
+                <div className="overflow-x-auto max-h-[500px]">
+                  <table className="w-full text-sm text-left">
+                    <thead className="text-xs text-slate-500 bg-slate-50/50 sticky top-0 uppercase">
+                      <tr>
+                        <th className="px-4 py-3">Service</th>
+                        <th className="px-4 py-3">Status</th>
+                        <th className="px-4 py-3 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allOrders.map((o) => (
+                        <tr key={o.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                          <td className="px-4 py-3 font-medium text-slate-900">{o.service_device_type}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${o.order_status === 'completed' ? 'bg-green-100 text-green-700' : o.order_status === 'assigned' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                              {o.order_status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <button 
+                              onClick={async () => {
+                                if (window.confirm('Delete this order permanently?')) {
+                                  await db.deleteOrder(o.id);
+                                  fetchData();
+                                }
+                              }}
+                              className="text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
             </div>
           </div>
         )}

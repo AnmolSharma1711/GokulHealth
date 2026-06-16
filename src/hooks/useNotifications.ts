@@ -60,6 +60,34 @@ export function useNotifications() {
     };
     setupLocalNotifications();
 
+    // Setup Web Service Worker for Closed-App background Push
+    if ('serviceWorker' in navigator && Capacitor.getPlatform() === 'web') {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          return registration.pushManager.getSubscription()
+            .then(async (subscription) => {
+              if (subscription) {
+                return subscription;
+              }
+              const response = await fetch('https://example.com/api/vapidPublicKey'); // Dummy VAPID fetch
+              const vapidPublicKey = await response.text(); 
+              // In a real app, convert vapidPublicKey to Uint8Array and use applicationServerKey
+              return registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                // applicationServerKey: convertedVapidKey
+              });
+            });
+        })
+        .then(subscription => {
+          console.log('User is subscribed to web push:', subscription);
+          db.savePushToken(user.id, JSON.stringify(subscription));
+        })
+        .catch(err => {
+          console.error('ServiceWorker registration failed: ', err);
+        });
+    }
+
     const checkNotifications = async () => {
       try {
         const notifications = await db.getNotificationsForUser(user.id, user.role);
