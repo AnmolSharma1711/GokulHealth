@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRazorpay } from "react-razorpay";
 import { Profile, CustomerDetails, Order } from '../../types/database';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
@@ -20,6 +21,7 @@ const SERVICES = [
 
 export function CustomerDashboard({ user }: Props) {
   const [currentTab, setCurrentTab] = useState<'book' | 'orders'>('book');
+  const { Razorpay } = useRazorpay();
   
   // Booking State
   const [selectedService, setSelectedService] = useState<string | null>(null);
@@ -82,19 +84,50 @@ export function CustomerDashboard({ user }: Props) {
     }
   };
 
-  const handleSimulatePayment = async (status: 'paid' | 'failed') => {
+  const handleRazorpayPayment = () => {
     if (!pendingOrder) return;
-    await db.updatePaymentStatus(pendingOrder.id, status);
-    if (status === 'paid') {
-      alert('Payment Successful! Your order has been placed.');
-      setPendingOrder(null);
-      setShowPayment(false);
-      setSelectedService(null);
-      setDurationMonths(1);
-      setCurrentTab('orders'); // Jump to orders view
-    } else {
-      alert('Payment Failed. Please try again.');
-    }
+    
+    const options = {
+      key: "rzp_test_T2DKoMwVosyxaj", // User provided test key
+      amount: (pendingOrder.locked_price * 100).toString(), // amount in paise
+      currency: "INR",
+      name: "Booking Ecosystem",
+      description: `Payment for ${pendingOrder.service_device_type}`,
+      handler: async (response: any) => {
+        // Payment successful
+        await db.updatePaymentStatus(pendingOrder.id, 'paid');
+        
+        // Trigger push notification to customer
+        await db.createNotification(
+          "Payment Received \u2705",
+          `Your payment of ₹${pendingOrder.locked_price.toLocaleString()} was successful. Your order is placed!`,
+          'customer',
+          user.id
+        );
+        
+        alert(`Payment Successful! Payment ID: ${response.razorpay_payment_id}`);
+        setPendingOrder(null);
+        setShowPayment(false);
+        setSelectedService(null);
+        setDurationMonths(1);
+        setCurrentTab('orders');
+      },
+      prefill: {
+        name: user.name || "Customer",
+        contact: user.phone_number || "",
+      },
+      theme: {
+        color: "#4f46e5",
+      },
+    };
+
+    const rzp = new Razorpay(options);
+    
+    rzp.on("payment.failed", function (response: any) {
+      alert(`Payment Failed: ${response.error.description}`);
+    });
+    
+    rzp.open();
   };
 
   const renderBookingTab = () => {
@@ -102,7 +135,7 @@ export function CustomerDashboard({ user }: Props) {
       return (
         <Card className="max-w-md mx-auto mt-8 border-primary-200">
           <CardHeader>
-            <CardTitle className="text-xl text-center">Payment Simulation</CardTitle>
+            <CardTitle className="text-xl text-center">Complete Your Payment</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
@@ -111,11 +144,8 @@ export function CustomerDashboard({ user }: Props) {
             </div>
             
             <div className="space-y-3">
-              <Button fullWidth onClick={() => handleSimulatePayment('paid')} className="bg-green-600 hover:bg-green-700">
-                Simulate Successful Payment (UPI/Card)
-              </Button>
-              <Button fullWidth variant="outline" onClick={() => handleSimulatePayment('failed')} className="border-red-200 text-red-600 hover:bg-red-50">
-                Simulate Failed Payment
+              <Button fullWidth onClick={handleRazorpayPayment} className="bg-indigo-600 hover:bg-indigo-700">
+                Pay Securely with Razorpay
               </Button>
               <Button fullWidth variant="ghost" onClick={() => setShowPayment(false)}>
                 Cancel

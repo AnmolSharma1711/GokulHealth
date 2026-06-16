@@ -42,8 +42,28 @@ export function AdminApp() {
   }
 
   const handleAssign = async (orderId: string, employeeId: string) => {
+    const orderToAssign = unassignedOrders.find(o => o.id === orderId);
+    if (!orderToAssign) return;
+
     await db.assignOrder(orderId, employeeId);
-    alert('Employee assigned successfully! (Push Notification Simulated)');
+    
+    // Notify Customer
+    await db.createNotification(
+      "Service Assigned \uD83D\uDE90",
+      `Your request for ${orderToAssign.service_device_type} has been assigned to a verified professional.`,
+      'customer',
+      orderToAssign.customer_id
+    );
+
+    // Notify Employee
+    await db.createNotification(
+      "New Job Assigned \uD83D\uDCE6",
+      `You have been assigned a new job for ${orderToAssign.service_device_type}. Check your Active Jobs tab!`,
+      'employee',
+      employeeId
+    );
+
+    alert('Employee assigned successfully! System notifications dispatched.');
     fetchData();
   };
 
@@ -74,40 +94,54 @@ export function AdminApp() {
     setNotifBody('');
   };
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
+      
+      {/* Mobile Top Header */}
+      <div className="md:hidden bg-indigo-900 text-white p-4 flex justify-between items-center sticky top-0 z-20">
+        <div className="flex items-center gap-2">
+          <Shield className="w-6 h-6 text-indigo-400" />
+          <h1 className="text-lg font-bold">Admin Console</h1>
+        </div>
+        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 bg-indigo-800 rounded-lg">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isSidebarOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}/></svg>
+        </button>
+      </div>
+
       {/* Sidebar Navigation */}
-      <aside className="w-64 bg-indigo-900 text-white flex flex-col fixed h-full z-10">
-        <div className="p-6 border-b border-indigo-800">
+      <aside className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform fixed md:sticky top-0 left-0 h-screen w-64 bg-indigo-900 text-white flex flex-col z-30`}>
+        <div className="p-6 border-b border-indigo-800 hidden md:block">
           <div className="flex items-center gap-3">
             <Shield className="w-8 h-8 text-indigo-400" />
             <h1 className="text-xl font-bold tracking-tight">Admin Console</h1>
           </div>
         </div>
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <button
-            onClick={() => setActiveTab('overview')}
+            onClick={() => { setActiveTab('overview'); setIsSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'overview' ? 'bg-indigo-800 text-white' : 'text-indigo-200 hover:bg-indigo-800/50 hover:text-white'}`}
           >
             <LayoutDashboard className="w-5 h-5" />
             <span className="font-medium">Analytics Overview</span>
           </button>
           <button
-            onClick={() => setActiveTab('matching')}
+            onClick={() => { setActiveTab('matching'); setIsSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'matching' ? 'bg-indigo-800 text-white' : 'text-indigo-200 hover:bg-indigo-800/50 hover:text-white'}`}
           >
             <Inbox className="w-5 h-5" />
             <span className="font-medium">Order Routing</span>
           </button>
           <button
-            onClick={() => setActiveTab('employees')}
+            onClick={() => { setActiveTab('employees'); setIsSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'employees' ? 'bg-indigo-800 text-white' : 'text-indigo-200 hover:bg-indigo-800/50 hover:text-white'}`}
           >
             <Users className="w-5 h-5" />
             <span className="font-medium">Employee Mgmt</span>
           </button>
           <button
-            onClick={() => setActiveTab('notifications')}
+            onClick={() => { setActiveTab('notifications'); setIsSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'notifications' ? 'bg-indigo-800 text-white' : 'text-indigo-200 hover:bg-indigo-800/50 hover:text-white'}`}
           >
             <Bell className="w-5 h-5" />
@@ -126,8 +160,16 @@ export function AdminApp() {
         </div>
       </aside>
 
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-20 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Main Content Area */}
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
         
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
@@ -159,9 +201,9 @@ export function AdminApp() {
         {/* ORDER MATCHING TAB */}
         {activeTab === 'matching' && (
           <div className="h-[calc(100vh-4rem)] flex flex-col">
-            <h2 className="text-3xl font-bold text-slate-900 mb-6 shrink-0">Employee-Order Matching</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6 shrink-0">Employee-Order Matching</h2>
             
-            <div className="flex-1 grid grid-cols-2 gap-6 min-h-0 overflow-hidden">
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0 overflow-hidden">
               
               {/* Unassigned Orders Panel */}
               <div className="flex flex-col bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
