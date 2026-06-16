@@ -56,7 +56,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('booking_session');
     setSession(null);
     setUser(null);
-    window.location.href = '/';
   };
 
   return (

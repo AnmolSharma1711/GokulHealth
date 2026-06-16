@@ -5,9 +5,11 @@ import { EmployeeDashboard } from './EmployeeDashboard';
 import { EmployeeDetails } from '../../types/database';
 import { db } from '../../store/MockDatabase';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export function EmployeeApp() {
   const { user, login, logout } = useAuth();
+  const navigate = useNavigate();
   const [details, setDetails] = useState<EmployeeDetails | null>(null);
   const [isDetailsLoading, setIsDetailsLoading] = useState(false);
 
@@ -35,6 +37,7 @@ export function EmployeeApp() {
           onClick={() => {
             setDetails(null);
             logout();
+            navigate('/');
           }}
           className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
         >

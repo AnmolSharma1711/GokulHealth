@@ -5,9 +5,11 @@ import { CustomerDashboard } from './CustomerDashboard';
 import { CustomerDetails } from '../../types/database';
 import { db } from '../../store/MockDatabase';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export function CustomerApp() {
   const { user, login, logout } = useAuth();
+  const navigate = useNavigate();
   const [details, setDetails] = useState<CustomerDetails | null>(null);
   const [isDetailsLoading, setIsDetailsLoading] = useState(false);
 
@@ -35,6 +37,7 @@ export function CustomerApp() {
           onClick={() => {
             setDetails(null);
             logout();
+            navigate('/');
           }}
           className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
         >

@@ -6,11 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/commo
 import { Button } from '../../components/common/Button';
 import { useAuth } from '../../context/AuthContext';
 import { AdminAuth } from './AdminAuth';
+import { useNavigate } from 'react-router-dom';
 
 type Tab = 'overview' | 'matching' | 'employees' | 'notifications' | 'system_admins';
 
 export function AdminApp() {
   const { user, login, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('matching');
   const [unassignedOrders, setUnassignedOrders] = useState<Order[]>([]);
   const [verifiedEmployees, setVerifiedEmployees] = useState<(Profile & EmployeeDetails)[]>([]);
@@ -183,7 +185,7 @@ export function AdminApp() {
         
         <div className="p-4 border-t border-indigo-800">
           <button
-            onClick={logout}
+            onClick={() => { logout(); navigate('/'); }}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-indigo-200 hover:bg-red-500/20 hover:text-red-400"
           >
             <LogOut className="w-5 h-5" />
