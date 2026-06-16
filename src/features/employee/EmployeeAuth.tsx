@@ -4,6 +4,7 @@ import { Input } from '../../components/common/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/common/Card';
 import { db } from '../../store/MockDatabase';
 import { Profile } from '../../types/database';
+import { hashMpin } from '../../utils/crypto';
 
 export function EmployeeAuth({ onLogin }: { onLogin: (profile: Profile) => void }) {
   const [phone, setPhone] = useState('');
@@ -25,11 +26,14 @@ export function EmployeeAuth({ onLogin }: { onLogin: (profile: Profile) => void 
     }
 
     try {
+      setIsLoading(true);
+      const hashedMpin = await hashMpin(mpin);
+
       if (isRegistering) {
         const newProfile: Profile = {
           id: crypto.randomUUID(),
           phone_number: phone,
-          mpin_hash: mpin,
+          mpin_hash: hashedMpin,
           role: 'employee',
           name: null,
           address: null,
@@ -38,7 +42,7 @@ export function EmployeeAuth({ onLogin }: { onLogin: (profile: Profile) => void 
         await db.registerProfile(newProfile);
         onLogin(newProfile);
       } else {
-        const profile = await db.login(phone, mpin);
+        const profile = await db.login(phone, hashedMpin);
         if (profile) {
           if (profile.role !== 'employee') {
             setError('This account is not an employee account');

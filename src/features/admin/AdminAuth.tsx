@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Shield } from 'lucide-react';
 import { Profile } from '../../types/database';
 import { db } from '../../store/MockDatabase';
+import { hashMpin } from '../../utils/crypto';
 
 interface Props {
   onLogin: (user: Profile) => void;
@@ -19,7 +20,8 @@ export function AdminAuth({ onLogin }: Props) {
     setIsLoading(true);
 
     try {
-      let user = await db.login(phone, mpin);
+      const hashedMpin = await hashMpin(mpin);
+      let user = await db.login(phone, hashedMpin);
       if (user) {
         if (user.role === 'admin') {
           onLogin(user);
