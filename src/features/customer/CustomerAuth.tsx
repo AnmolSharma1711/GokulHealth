@@ -26,7 +26,6 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
     }
 
     try {
-      setIsLoading(true);
       const hashedMpin = await hashMpin(mpin);
 
       if (isRegistering) {
