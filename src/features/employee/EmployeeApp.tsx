@@ -16,10 +16,15 @@ export function EmployeeApp() {
   useEffect(() => {
     if (user && user.name && user.address) {
       setIsDetailsLoading(true);
-      db.getEmployeeDetails(user.id).then(d => {
+      const fetchDetails = async () => {
+        const d = await db.getEmployeeDetails(user.id);
         setDetails(d);
-        setIsDetailsLoading(false);
-      });
+      };
+      
+      fetchDetails().then(() => setIsDetailsLoading(false));
+      
+      const interval = setInterval(fetchDetails, 3000);
+      return () => clearInterval(interval);
     }
   }, [user]);
 
