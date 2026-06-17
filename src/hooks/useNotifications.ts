@@ -104,8 +104,8 @@ export function useNotifications() {
                   body: notif.body,
                   id: Math.floor(Math.random() * 100000), 
                   schedule: { at: new Date(Date.now() + 1000) },
-                  largeIcon: "ic_launcher",
-                  smallIcon: "ic_launcher",
+                  largeIcon: "ic_logo",
+                  smallIcon: "ic_logo",
                   actionTypeId: "",
                   extra: null
                 }
