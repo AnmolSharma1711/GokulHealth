@@ -30,8 +30,8 @@ export function CustomerApp() {
   const needsProfileSetup = !user.name || !user.address || !details;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-10">
+    <div className="h-[100dvh] bg-slate-50 flex flex-col overflow-hidden">
+      <header className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm shrink-0 z-10">
         <h1 className="text-xl font-bold text-primary-600">Customer Portal</h1>
         <button 
           onClick={() => {
@@ -45,7 +45,7 @@ export function CustomerApp() {
         </button>
       </header>
       
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-6 overflow-y-auto relative">
         <div className="max-w-5xl mx-auto">
           {isDetailsLoading ? (
             <div className="flex justify-center items-center py-20">
