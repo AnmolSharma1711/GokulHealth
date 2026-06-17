@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/common/Button';
-import { Input } from '../../components/common/Input';
+
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/common/Card';
 import { db } from '../../store/MockDatabase';
 import { Profile } from '../../types/database';

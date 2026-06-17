@@ -71,7 +71,7 @@ export function useNotifications() {
                 return subscription;
               }
               const response = await fetch('https://example.com/api/vapidPublicKey'); // Dummy VAPID fetch
-              const vapidPublicKey = await response.text(); 
+              await response.text(); 
               // In a real app, convert vapidPublicKey to Uint8Array and use applicationServerKey
               return registration.pushManager.subscribe({
                 userVisibleOnly: true,

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/commo
 import { db } from '../../store/MockDatabase';
 import { Profile } from '../../types/database';
 import { hashMpin } from '../../utils/crypto';
-import { Lock, Phone, UserPlus, LogIn, Briefcase } from 'lucide-react';
+import { Lock, Phone, UserPlus, Briefcase } from 'lucide-react';
 
 export function EmployeeAuth({ onLogin }: { onLogin: (profile: Profile) => void }) {
   const [phone, setPhone] = useState('');
