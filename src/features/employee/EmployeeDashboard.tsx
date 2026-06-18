@@ -3,7 +3,8 @@ import { Profile, EmployeeDetails, Order } from '../../types/database';
 import { Card, CardContent } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { db } from '../../store/MockDatabase';
-import { Clock, MapPin, BriefcaseMedical, CheckCircle, History, Sparkles } from 'lucide-react';
+import { Clock, MapPin, BriefcaseMedical, CheckCircle, History, Sparkles, User } from 'lucide-react';
+import { ProfileEditor } from '../../components/common/ProfileEditor';
 
 interface Props {
   user: Profile;
@@ -12,7 +13,7 @@ interface Props {
 
 export function EmployeeDashboard({ user, details }: Props) {
   const [jobs, setJobs] = useState<Order[]>([]);
-  const [view, setView] = useState<'active' | 'history'>('active');
+  const [view, setView] = useState<'active' | 'history' | 'profile'>('active');
 
   const fetchJobs = async () => {
     const fetchedJobs = await db.getOrdersByEmployee(user.id);
@@ -59,6 +60,47 @@ export function EmployeeDashboard({ user, details }: Props) {
   const activeJobs = jobs.filter(j => j.order_status === 'assigned');
   const completedJobs = jobs.filter(j => j.order_status === 'completed');
   const displayedJobs = view === 'active' ? activeJobs : completedJobs;
+
+  if (view === 'profile') {
+    return (
+      <div className="space-y-8 pb-28">
+        <ProfileEditor profile={user} />
+        {/* Bottom Navigation */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-white/50 px-6 pt-4 flex justify-around items-center z-50 pb-safe shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] rounded-t-3xl">
+          <button 
+            onClick={() => setView('active')}
+            className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${view === 'active' ? 'text-emerald-600 transform -translate-y-1' : 'text-slate-400 hover:text-slate-600'}`}
+          >
+            <div className={`relative p-2 rounded-xl ${view === 'active' ? 'bg-emerald-50' : ''}`}>
+              <Clock className="w-6 h-6" />
+              {activeJobs.length > 0 && <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white shadow-sm animate-pulse" />}
+            </div>
+            <span className="text-[11px] font-bold uppercase tracking-wider">Active Jobs</span>
+          </button>
+          
+          <button 
+            onClick={() => setView('history')}
+            className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${view === 'history' ? 'text-emerald-600 transform -translate-y-1' : 'text-slate-400 hover:text-slate-600'}`}
+          >
+            <div className={`p-2 rounded-xl ${view === 'history' ? 'bg-emerald-50' : ''}`}>
+              <History className="w-6 h-6" />
+            </div>
+            <span className="text-[11px] font-bold uppercase tracking-wider">History</span>
+          </button>
+
+          <button 
+            onClick={() => setView('profile')}
+            className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${view === 'profile' ? 'text-emerald-600 transform -translate-y-1' : 'text-slate-400 hover:text-slate-600'}`}
+          >
+            <div className={`p-2 rounded-xl ${view === 'profile' ? 'bg-emerald-50' : ''}`}>
+              <User className="w-6 h-6" />
+            </div>
+            <span className="text-[11px] font-bold uppercase tracking-wider">Profile</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 pb-28">
@@ -172,6 +214,16 @@ export function EmployeeDashboard({ user, details }: Props) {
             <History className="w-6 h-6" />
           </div>
           <span className="text-[11px] font-bold uppercase tracking-wider">History</span>
+        </button>
+
+        <button 
+          onClick={() => setView('profile')}
+          className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${view === 'profile' ? 'text-emerald-600 transform -translate-y-1' : 'text-slate-400 hover:text-slate-600'}`}
+        >
+          <div className={`p-2 rounded-xl ${view === 'profile' ? 'bg-emerald-50' : ''}`}>
+            <User className="w-6 h-6" />
+          </div>
+          <span className="text-[11px] font-bold uppercase tracking-wider">Profile</span>
         </button>
       </div>
     </div>

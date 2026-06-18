@@ -7,8 +7,9 @@ import { Button } from '../../components/common/Button';
 import { useAuth } from '../../context/AuthContext';
 import { AdminAuth } from './AdminAuth';
 import { useNavigate } from 'react-router-dom';
+import { ProfileEditor } from '../../components/common/ProfileEditor';
 
-type Tab = 'overview' | 'matching' | 'employees' | 'notifications' | 'system_admins' | 'database';
+type Tab = 'overview' | 'matching' | 'employees' | 'notifications' | 'system_admins' | 'database' | 'profile';
 
 export function AdminApp() {
   const { user, login, logout } = useAuth();
@@ -29,6 +30,7 @@ export function AdminApp() {
   const [notifBody, setNotifBody] = useState('');
   const [notifTarget, setNotifTarget] = useState('all');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<Profile | null>(null);
 
   const fetchData = async () => {
     if (!user) return;
@@ -188,7 +190,14 @@ export function AdminApp() {
           </button>
         </nav>
         
-        <div className="p-4 border-t border-indigo-800">
+        <div className="p-4 border-t border-indigo-800 space-y-2">
+          <button
+            onClick={() => { setActiveTab('profile'); setIsSidebarOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'profile' ? 'bg-indigo-800 text-white' : 'text-indigo-200 hover:bg-indigo-800/50 hover:text-white'}`}
+          >
+            <Users className="w-5 h-5" />
+            <span className="font-medium">My Profile</span>
+          </button>
           <button
             onClick={() => { logout(); navigate('/'); }}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-indigo-200 hover:bg-red-500/20 hover:text-red-400"
@@ -209,6 +218,11 @@ export function AdminApp() {
 
       {/* Main Content Area */}
       <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+        {activeTab === 'profile' && (
+          <div className="space-y-6">
+            <ProfileEditor profile={user} />
+          </div>
+        )}
         
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
@@ -544,7 +558,13 @@ export function AdminApp() {
                               {u.role}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-right">
+                          <td className="px-4 py-3 text-right flex justify-end gap-2">
+                            <button 
+                              onClick={() => setEditingUser(u)}
+                              className="text-indigo-600 hover:text-indigo-800 p-1.5 hover:bg-indigo-50 rounded-lg transition-colors text-xs font-bold uppercase tracking-wider"
+                            >
+                              Edit
+                            </button>
                             {u.id !== user.id && (
                               <button 
                                 onClick={async () => {
@@ -616,6 +636,22 @@ export function AdminApp() {
         )}
 
       </main>
+      
+      {editingUser && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl">
+            <ProfileEditor 
+              profile={editingUser} 
+              isAdminEdit={true}
+              onCancel={() => setEditingUser(null)}
+              onSave={() => {
+                setEditingUser(null);
+                fetchData();
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

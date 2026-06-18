@@ -4,7 +4,8 @@ import { Profile, CustomerDetails, Order } from '../../types/database';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { db } from '../../store/MockDatabase';
-import { Clock, ShieldCheck, Stethoscope, Home, ClipboardList, Zap } from 'lucide-react';
+import { Clock, ShieldCheck, Stethoscope, Home, ClipboardList, Zap, User } from 'lucide-react';
+import { ProfileEditor } from '../../components/common/ProfileEditor';
 
 interface Props {
   user: Profile;
@@ -20,7 +21,7 @@ const SERVICES = [
 ];
 
 export function CustomerDashboard({ user }: Props) {
-  const [currentTab, setCurrentTab] = useState<'book' | 'orders'>('book');
+  const [currentTab, setCurrentTab] = useState<'book' | 'orders' | 'profile'>('book');
   const { Razorpay } = useRazorpay();
   
   // Booking State
@@ -402,9 +403,17 @@ export function CustomerDashboard({ user }: Props) {
     );
   };
 
+  const renderContent = () => {
+    if (currentTab === 'profile') {
+      return <ProfileEditor profile={user} />;
+    }
+    if (currentTab === 'book') return renderBookingTab();
+    return renderOrdersTab();
+  };
+
   return (
-    <div className="pb-28">
-      {currentTab === 'book' ? renderBookingTab() : renderOrdersTab()}
+    <div className="space-y-8 pb-28">
+      {renderContent()}
 
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-white/50 px-6 pt-4 flex justify-around items-center z-50 pb-safe shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] rounded-t-3xl">
@@ -415,7 +424,7 @@ export function CustomerDashboard({ user }: Props) {
           <div className={`p-2 rounded-xl ${currentTab === 'book' ? 'bg-primary-50' : ''}`}>
             <Home className="w-6 h-6" />
           </div>
-          <span className="text-[11px] font-bold uppercase tracking-wider">Book</span>
+          <span className="text-[11px] font-bold uppercase tracking-wider">Services</span>
         </button>
         
         <button 
@@ -424,9 +433,19 @@ export function CustomerDashboard({ user }: Props) {
         >
           <div className={`relative p-2 rounded-xl ${currentTab === 'orders' ? 'bg-primary-50' : ''}`}>
             <ClipboardList className="w-6 h-6" />
-            {myOrders.length > 0 && <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white shadow-sm animate-pulse" />}
+            {myOrders.length > 0 && <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white shadow-sm" />}
           </div>
-          <span className="text-[11px] font-bold uppercase tracking-wider">Orders</span>
+          <span className="text-[11px] font-bold uppercase tracking-wider">My Orders</span>
+        </button>
+
+        <button 
+          onClick={() => setCurrentTab('profile')}
+          className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${currentTab === 'profile' ? 'text-primary-600 transform -translate-y-1' : 'text-slate-400 hover:text-slate-600'}`}
+        >
+          <div className={`p-2 rounded-xl ${currentTab === 'profile' ? 'bg-primary-50' : ''}`}>
+            <User className="w-6 h-6" />
+          </div>
+          <span className="text-[11px] font-bold uppercase tracking-wider">Profile</span>
         </button>
       </div>
     </div>
