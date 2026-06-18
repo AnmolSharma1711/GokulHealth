@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, Users, Inbox, Bell, LayoutDashboard, LogOut, Database, Trash2 } from 'lucide-react';
 import { db } from '../../store/MockDatabase';
-import { Order, Profile, EmployeeDetails } from '../../types/database';
+import { Order, Profile, EmployeeDetails, Service } from '../../types/database';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { useAuth } from '../../context/AuthContext';
@@ -9,7 +9,7 @@ import { AdminAuth } from './AdminAuth';
 import { useNavigate } from 'react-router-dom';
 import { ProfileEditor } from '../../components/common/ProfileEditor';
 
-type Tab = 'overview' | 'matching' | 'employees' | 'notifications' | 'system_admins' | 'database' | 'profile';
+type Tab = 'overview' | 'matching' | 'employees' | 'notifications' | 'system_admins' | 'database' | 'profile' | 'services';
 
 export function AdminApp() {
   const { user, login, logout } = useAuth();
@@ -24,6 +24,7 @@ export function AdminApp() {
   
   const [allUsers, setAllUsers] = useState<Profile[]>([]);
   const [allOrders, setAllOrders] = useState<Order[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   
   // Notification State
   const [notifTitle, setNotifTitle] = useState('');
@@ -31,6 +32,8 @@ export function AdminApp() {
   const [notifTarget, setNotifTarget] = useState('all');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<Profile | null>(null);
+  const [editingService, setEditingService] = useState<Service | null>(null);
+  const [reassigningOrder, setReassigningOrder] = useState<Order | null>(null);
 
   const fetchData = async () => {
     if (!user) return;
@@ -40,6 +43,7 @@ export function AdminApp() {
     const admins = await db.getAdmins();
     const users = await db.getAllUsers();
     const allOrds = await db.getAllOrders();
+    const allServices = await db.getServices();
     
     setUnassignedOrders(orders);
     setVerifiedEmployees(verified);
@@ -47,6 +51,7 @@ export function AdminApp() {
     setAdminUsers(admins);
     setAllUsers(users);
     setAllOrders(allOrds);
+    setServices(allServices);
   };
 
   useEffect(() => {
@@ -175,6 +180,13 @@ export function AdminApp() {
           >
             <Users className="w-5 h-5" />
             <span className="font-medium">Employee Mgmt</span>
+          </button>
+          <button
+            onClick={() => { setActiveTab('services'); setIsSidebarOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'services' ? 'bg-indigo-800 text-white' : 'text-indigo-200 hover:bg-indigo-800/50 hover:text-white'}`}
+          >
+            <LayoutDashboard className="w-5 h-5" />
+            <span className="font-medium">Services & Pricing</span>
           </button>
           <button
             onClick={() => { setActiveTab('notifications'); setIsSidebarOpen(false); }}
@@ -580,8 +592,12 @@ export function AdminApp() {
                               <button 
                                 onClick={async () => {
                                   if (window.confirm('Delete this user permanently?')) {
-                                    await db.deleteUser(u.id);
-                                    fetchData();
+                                    try {
+                                      await db.deleteUser(u.id);
+                                      fetchData();
+                                    } catch (err: any) {
+                                      alert('Failed to delete user: ' + err.message);
+                                    }
                                   }
                                 }}
                                 className="text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded-lg transition-colors"
@@ -619,16 +635,36 @@ export function AdminApp() {
                         <tr key={o.id} className="border-b border-slate-100 dark:border-slate-700/30 hover:bg-slate-50 dark:bg-slate-800 transition-colors">
                           <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{o.service_device_type}</td>
                           <td className="px-4 py-3">
-                            <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${o.order_status === 'completed' ? 'bg-green-100 text-green-700' : o.order_status === 'assigned' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                              {o.order_status}
-                            </span>
+                            {(() => {
+                              const isCancelled = o.order_status === 'cancelled' || (o.service_details && o.service_details.startsWith('[CANCELLED]'));
+                              if (isCancelled) {
+                                return <span className="px-2 py-1 rounded-full text-xs font-semibold capitalize bg-red-100 text-red-700">cancelled</span>;
+                              }
+                              return (
+                                <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${o.order_status === 'completed' ? 'bg-green-100 text-green-700' : o.order_status === 'assigned' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                  {o.order_status}
+                                </span>
+                              );
+                            })()}
                           </td>
-                          <td className="px-4 py-3 text-right">
+                          <td className="px-4 py-3 text-right flex justify-end gap-2">
+                            {o.order_status === 'assigned' && !o.service_details?.startsWith('[CANCELLED]') && (
+                              <button 
+                                onClick={() => setReassigningOrder(o)}
+                                className="text-amber-600 hover:text-amber-800 p-1.5 hover:bg-amber-50 rounded-lg transition-colors text-xs font-bold uppercase tracking-wider"
+                              >
+                                Re-assign
+                              </button>
+                            )}
                             <button 
                               onClick={async () => {
                                 if (window.confirm('Delete this order permanently?')) {
-                                  await db.deleteOrder(o.id);
-                                  fetchData();
+                                  try {
+                                    await db.deleteOrder(o.id);
+                                    fetchData();
+                                  } catch (err: any) {
+                                    alert('Failed to delete order: ' + err.message);
+                                  }
                                 }
                               }}
                               className="text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded-lg transition-colors"
@@ -646,6 +682,48 @@ export function AdminApp() {
           </div>
         )}
 
+        {/* SERVICES TAB */}
+        {activeTab === 'services' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Services & Pricing</h2>
+              <Button onClick={() => setEditingService({ id: `svc_${Date.now()}`, title: '', price: 0, pricing_type: 'daily', icon: 'Stethoscope', created_at: new Date().toISOString() })} className="bg-indigo-600 hover:bg-indigo-700">
+                + Add Service
+              </Button>
+            </div>
+            <div className="grid lg:grid-cols-2 gap-6">
+              {services.map(s => (
+                <Card key={s.id} className="glass-card">
+                  <CardContent className="p-6 flex justify-between items-center">
+                    <div>
+                      <h4 className="font-bold text-xl text-slate-900 dark:text-white">{s.title}</h4>
+                      <p className="text-slate-500 font-medium mt-1">₹{s.price} / {s.pricing_type}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => setEditingService(s)} className="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors font-bold uppercase text-xs">
+                        Edit
+                      </button>
+                      <button onClick={async () => {
+                        if (window.confirm('Delete this service?')) {
+                          await db.deleteService(s.id);
+                          fetchData();
+                        }
+                      }} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              {services.length === 0 && (
+                <div className="col-span-full text-center py-12 text-slate-500">
+                  No services found. Add one above.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
       </main>
       
       {editingUser && (
@@ -658,9 +736,114 @@ export function AdminApp() {
               onSave={() => {
                 setEditingUser(null);
                 fetchData();
-              }}
+              }} 
             />
           </div>
+        </div>
+      )}
+
+      {/* Editing Service Modal */}
+      {editingService && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Edit Service</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  const exists = services.find(s => s.id === editingService.id);
+                  if (exists) {
+                    await db.updateService(editingService.id, editingService);
+                  } else {
+                    await db.createService(editingService);
+                  }
+                  setEditingService(null);
+                  fetchData();
+                } catch (error: any) {
+                  alert('Failed to save service: ' + error.message);
+                }
+              }} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-1">Service Title</label>
+                  <input required type="text" className="w-full p-2 border rounded-lg" value={editingService.title} onChange={e => setEditingService({...editingService, title: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-1">Price (₹)</label>
+                  <input required type="number" className="w-full p-2 border rounded-lg" value={editingService.price} onChange={e => setEditingService({...editingService, price: Number(e.target.value)})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-1">Pricing Type</label>
+                  <select className="w-full p-2 border rounded-lg" value={editingService.pricing_type} onChange={e => setEditingService({...editingService, pricing_type: e.target.value as any})}>
+                    <option value="hourly">Hourly</option>
+                    <option value="daily">Daily</option>
+                    <option value="monthly">Monthly</option>
+                  </select>
+                </div>
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button variant="outline" type="button" onClick={() => setEditingService(null)}>Cancel</Button>
+                  <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white">Save Service</Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Reassign Order Modal */}
+      {reassigningOrder && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <CardHeader className="border-b border-slate-100 flex justify-between flex-row items-center">
+              <div>
+                <CardTitle>Emergency Reassignment</CardTitle>
+                <p className="text-sm text-slate-500 mt-1">Select an available employee to take over this active job.</p>
+              </div>
+              <button onClick={() => setReassigningOrder(null)} className="text-slate-400 hover:text-slate-600">✕</button>
+            </CardHeader>
+            <CardContent className="overflow-y-auto p-0">
+              <div className="divide-y divide-slate-100">
+                {verifiedEmployees.filter(emp => {
+                  // Only show employees NOT currently assigned to an active uncancelled order
+                  const isBusy = allOrders.some(o => o.employee_id === emp.id && (o.order_status === 'assigned') && !o.service_details?.startsWith('[CANCELLED]'));
+                  return !isBusy && emp.id !== reassigningOrder.employee_id;
+                }).map(emp => (
+                  <div key={emp.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-xl">
+                        {emp.name?.charAt(0) || 'E'}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900">{emp.name}</h4>
+                        <p className="text-sm text-slate-500">{emp.phone_number} • Exp: {emp.experience}</p>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={async () => {
+                        if (window.confirm(`Are you sure you want to reassign this order to ${emp.name}?`)) {
+                          await db.reassignOrder(reassigningOrder.id, emp.id);
+                          setReassigningOrder(null);
+                          fetchData();
+                        }
+                      }}
+                      className="bg-amber-500 hover:bg-amber-600"
+                    >
+                      Assign Job
+                    </Button>
+                  </div>
+                ))}
+                {verifiedEmployees.filter(emp => {
+                  const isBusy = allOrders.some(o => o.employee_id === emp.id && (o.order_status === 'assigned') && !o.service_details?.startsWith('[CANCELLED]'));
+                  return !isBusy && emp.id !== reassigningOrder.employee_id;
+                }).length === 0 && (
+                  <div className="p-8 text-center text-slate-500">
+                    No available verified employees found.
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>

@@ -15,6 +15,19 @@ export function EmployeeDashboard({ user, details }: Props) {
   const [jobs, setJobs] = useState<Order[]>([]);
   const [view, setView] = useState<'active' | 'history' | 'profile'>('active');
 
+  const formatDuration = (start?: string, end?: string, fallbackMonths?: number) => {
+    if (!start || !end) return `${fallbackMonths || 1} Month(s)`;
+    const s = new Date(start);
+    const e = new Date(end);
+    const diffDays = Math.ceil(Math.abs(e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    if (diffDays === 1) return '1 Day';
+    if (diffDays < 30) return `${diffDays} Days`;
+    const months = Math.floor(diffDays / 30);
+    const remainingDays = diffDays % 30;
+    if (remainingDays === 0) return `${months} Month${months > 1 ? 's' : ''}`;
+    return `${months} Month${months > 1 ? 's' : ''} ${remainingDays} Day${remainingDays > 1 ? 's' : ''}`;
+  };
+
   const fetchJobs = async () => {
     const fetchedJobs = await db.getOrdersByEmployee(user.id);
     setJobs(fetchedJobs);
@@ -100,7 +113,7 @@ export function EmployeeDashboard({ user, details }: Props) {
                   <div>
                     <h3 className="font-bold text-xl text-slate-900 dark:text-white mb-2">{job.service_device_type}</h3>
                     <span className="inline-block px-3 py-1 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800">
-                      Duration: {job.duration_months} Months
+                      Duration: {formatDuration(job.start_date, job.end_date, job.duration_months)}
                     </span>
                   </div>
                   <div className="bg-emerald-50 dark:bg-emerald-900/40 p-3 rounded-2xl group-hover:scale-110 transition-transform duration-300">

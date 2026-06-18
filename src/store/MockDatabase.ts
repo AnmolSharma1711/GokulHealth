@@ -1,4 +1,4 @@
-import { Profile, CustomerDetails, EmployeeDetails, Order } from '../types/database';
+import { Profile, CustomerDetails, EmployeeDetails, Order, Service } from '../types/database';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
@@ -168,7 +168,8 @@ export class RealDatabase {
     await supabase.from('customer_details').delete().eq('id', id);
     await supabase.from('employee_details').delete().eq('id', id);
     await supabase.from('orders').delete().or(`customer_id.eq.${id},employee_id.eq.${id}`);
-    await supabase.from('profiles').delete().eq('id', id);
+    const { error } = await supabase.from('profiles').delete().eq('id', id);
+    if (error) throw new Error(error.message);
   }
 
   async getAllOrders(): Promise<Order[]> {
@@ -177,7 +178,8 @@ export class RealDatabase {
   }
 
   async deleteOrder(id: string): Promise<void> {
-    await supabase.from('orders').delete().eq('id', id);
+    const { error } = await supabase.from('orders').delete().eq('id', id);
+    if (error) throw new Error(error.message);
   }
 
   async deleteNotification(id: string): Promise<void> {
@@ -221,6 +223,80 @@ export class RealDatabase {
       .eq('id', orderId);
     if (error) throw new Error(error.message);
   }
+
+  async cancelOrder(orderId: string, customerId: string): Promise<void> {
+    const { data } = await supabase.from('orders').select('employee_id, service_details').eq('id', orderId).single();
+    const newDetails = `[CANCELLED] ${data?.service_details || ''}`;
+    const { error } = await supabase
+      .from('orders')
+      .update({ 
+        order_status: 'completed',
+        service_details: newDetails
+      })
+      .eq('id', orderId)
+      .eq('customer_id', customerId);
+    if (error) throw new Error(error.message);
+    if (data && data.employee_id) {
+      await this.createNotification(
+        "Appointment Cancelled",
+        "The customer has cancelled their appointment. You are now available for new assignments.",
+        "employee",
+        data.employee_id
+      );
+    }
+  }
+  async reassignOrder(orderId: string, newEmployeeId: string): Promise<void> {
+    const { data: order } = await supabase.from('orders').select('employee_id').eq('id', orderId).single();
+    const oldEmployeeId = order?.employee_id;
+
+    const { error } = await supabase
+      .from('orders')
+      .update({ employee_id: newEmployeeId, order_status: 'assigned' })
+      .eq('id', orderId);
+      
+    if (error) throw new Error(error.message);
+
+    // Notify new employee
+    await this.createNotification(
+      "Emergency Reassignment",
+      "You have been assigned to an emergency appointment. Please check your dashboard for details.",
+      "employee",
+      newEmployeeId
+    );
+
+    // Notify old employee if they exist
+    if (oldEmployeeId) {
+      await this.createNotification(
+        "Shift Reassigned",
+        "An appointment assigned to you has been emergency-reassigned to another staff member. You are now available.",
+        "employee",
+        oldEmployeeId
+      );
+    }
+  }
+
+  // --- Services ---
+  async getServices(): Promise<Service[]> {
+    const { data, error } = await supabase.from('services').select('*').order('created_at', { ascending: true });
+    if (error) return [];
+    return data as Service[];
+  }
+
+  async createService(service: Service): Promise<void> {
+    const { error } = await supabase.from('services').insert([service]);
+    if (error) throw new Error(error.message);
+  }
+
+  async updateService(id: string, updates: Partial<Service>): Promise<void> {
+    const { error } = await supabase.from('services').update(updates).eq('id', id);
+    if (error) throw new Error(error.message);
+  }
+
+  async deleteService(id: string): Promise<void> {
+    const { error } = await supabase.from('services').delete().eq('id', id);
+    if (error) throw new Error(error.message);
+  }
+
   // --- Push Tokens ---
   async savePushToken(userId: string, token: string): Promise<void> {
     const { error } = await supabase

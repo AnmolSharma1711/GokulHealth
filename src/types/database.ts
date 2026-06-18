@@ -32,7 +32,7 @@ export interface EmployeeDetails {
 }
 
 export type PaymentStatus = 'pending' | 'paid' | 'failed';
-export type OrderStatus = 'unassigned' | 'assigned' | 'completed';
+export type OrderStatus = 'unassigned' | 'assigned' | 'completed' | 'cancelled';
 
 export interface Order {
   id: string;
@@ -58,5 +58,15 @@ export interface Notification {
   title: string;
   body: string;
   read_by: string[];
+}
+
+export type PricingType = 'hourly' | 'daily' | 'monthly';
+
+export interface Service {
+  id: string;
+  title: string;
+  price: number;
+  pricing_type: PricingType;
+  icon: string;
   created_at: string;
 }

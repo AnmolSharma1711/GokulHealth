@@ -46,6 +46,10 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
     try {
       const url = await db.uploadAvatar(profile.id, file);
       setAvatarUrl(url);
+      await db.updateProfile(profile.id, { avatar_url: url });
+      if (onSave) {
+        onSave({ ...profile, avatar_url: url });
+      }
     } catch (error) {
       console.error('Failed to upload avatar:', error);
       alert('Failed to upload avatar.');

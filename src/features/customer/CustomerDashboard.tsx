@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useRazorpay } from "react-razorpay";
-import { Profile, CustomerDetails, Order } from '../../types/database';
+import { Profile, CustomerDetails, Order, Service } from '../../types/database';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { db } from '../../store/MockDatabase';
-import { Clock, ShieldCheck, Stethoscope, Home, ClipboardList, Zap, User } from 'lucide-react';
+import { Clock, ShieldCheck, Stethoscope, Home, ClipboardList, Zap, User, PhoneCall } from 'lucide-react';
 import { ProfileEditor } from '../../components/common/ProfileEditor';
 
 interface Props {
@@ -12,13 +12,7 @@ interface Props {
   details: CustomerDetails;
 }
 
-const SERVICES = [
-  { id: 'nurse_12h', title: 'Nursing Staff (12 hours)', basePrice: 15000, icon: Stethoscope },
-  { id: 'nurse_24h', title: 'Nursing Staff (24 hours)', basePrice: 28000, icon: Stethoscope },
-  { id: 'physiotherapy', title: 'Physiotherapist', basePrice: 12000, icon: Stethoscope },
-  { id: 'o2_concentrator', title: 'Oxygen Concentrator', basePrice: 4500, icon: ShieldCheck },
-  { id: 'hospital_bed', title: 'Hospital Bed (Motorized)', basePrice: 6000, icon: ShieldCheck },
-];
+
 
 export function CustomerDashboard({ user }: Props) {
   const [currentTab, setCurrentTab] = useState<'book' | 'orders' | 'profile'>('book');
@@ -37,6 +31,29 @@ export function CustomerDashboard({ user }: Props) {
 
   const [myOrders, setMyOrders] = useState<Order[]>([]);
   const [assignedEmployees, setAssignedEmployees] = useState<Record<string, Profile>>({});
+  const [services, setServices] = useState<Service[]>([]);
+
+  const loadServices = async () => {
+    const data = await db.getServices();
+    setServices(data);
+  };
+
+  useEffect(() => {
+    loadServices();
+  }, []);
+
+  const formatDuration = (start?: string, end?: string, fallbackMonths?: number) => {
+    if (!start || !end) return `${fallbackMonths || 1} Month(s)`;
+    const s = new Date(start);
+    const e = new Date(end);
+    const diffDays = Math.ceil(Math.abs(e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    if (diffDays === 1) return '1 Day';
+    if (diffDays < 30) return `${diffDays} Days`;
+    const months = Math.floor(diffDays / 30);
+    const remainingDays = diffDays % 30;
+    if (remainingDays === 0) return `${months} Month${months > 1 ? 's' : ''}`;
+    return `${months} Month${months > 1 ? 's' : ''} ${remainingDays} Day${remainingDays > 1 ? 's' : ''}`;
+  };
 
   const fetchMyOrders = async () => {
     const orders = await db.getOrdersByCustomer(user.id);
@@ -53,6 +70,17 @@ export function CustomerDashboard({ user }: Props) {
     }
   };
 
+  const handleCancelOrder = async (orderId: string) => {
+    if (window.confirm('Are you sure you want to cancel this appointment?')) {
+      try {
+        await db.cancelOrder(orderId, user.id);
+        fetchMyOrders();
+      } catch (err: any) {
+        alert("Failed to cancel: " + err.message);
+      }
+    }
+  };
+
   useEffect(() => {
     if (currentTab === 'orders') {
       fetchMyOrders();
@@ -61,7 +89,7 @@ export function CustomerDashboard({ user }: Props) {
     }
   }, [currentTab, user.id]);
 
-  const activeService = SERVICES.find((s) => s.id === selectedService);
+  const activeService = services.find((s) => s.id === selectedService);
   
   const calculatePrice = () => {
     if (!activeService || !startDate || !endDate) return 0;
@@ -72,15 +100,18 @@ export function CustomerDashboard({ user }: Props) {
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
     
-    // basePrice is roughly per month (30 days)
-    const dailyRate = activeService.basePrice / 30;
-    let baseTotal = dailyRate * diffDays;
-    
-    // Adjust rate for 24 Hours shift
-    if (timeEachDay === '24 Hours') {
-      baseTotal *= 2;
+    let baseTotal = 0;
+    if (activeService.pricing_type === 'hourly') {
+      const hoursPerDay = timeEachDay === '24 Hours' ? 24 : 12;
+      baseTotal = activeService.price * hoursPerDay * diffDays;
+    } else if (activeService.pricing_type === 'monthly') {
+      const dailyRate = activeService.price / 30;
+      baseTotal = dailyRate * diffDays;
+    } else {
+      // default daily
+      baseTotal = activeService.price * diffDays;
     }
-
+    
     const discount = diffDays >= 180 ? 0.15 : diffDays >= 90 ? 0.10 : 0;
     return Math.round(baseTotal * (1 - discount));
   };
@@ -223,9 +254,11 @@ export function CustomerDashboard({ user }: Props) {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {SERVICES.map((service) => {
+          {services.map((service) => {
             const isSelected = selectedService === service.id;
-            const Icon = service.icon;
+            let Icon = Stethoscope;
+            if (service.icon === 'ShieldCheck') Icon = ShieldCheck;
+            
             return (
               <button
                 key={service.id}
@@ -241,7 +274,10 @@ export function CustomerDashboard({ user }: Props) {
                   <Icon className={`w-6 h-6 ${isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-slate-500 dark:text-slate-400'}`} />
                 </div>
                 <h3 className="font-bold text-sm text-slate-900 dark:text-white leading-tight z-10">{service.title}</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium z-10">₹{service.basePrice.toLocaleString()}/mo</p>
+                <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-2 z-10">
+                  ₹{service.price.toLocaleString()}
+                  <span className="text-sm font-bold text-slate-400 lowercase ml-1">/{service.pricing_type}</span>
+                </div>
               </button>
             );
           })}
@@ -353,40 +389,51 @@ export function CustomerDashboard({ user }: Props) {
 
         <div className="grid grid-cols-1 gap-6">
           {myOrders.map(order => {
-            const isCompleted = order.order_status === 'completed';
+            const isCancelled = order.order_status === 'cancelled' || (order.service_details && order.service_details.startsWith('[CANCELLED]'));
+            const isCompleted = order.order_status === 'completed' && !isCancelled;
             const isAssigned = order.order_status === 'assigned' || isCompleted;
 
             return (
-              <Card key={order.id} className={`glass-card overflow-hidden border-l-4 ${isCompleted ? 'border-l-emerald-500' : isAssigned ? 'border-l-blue-500' : 'border-l-amber-500'}`}>
+              <Card key={order.id} className={`glass-card overflow-hidden border-l-4 ${isCancelled ? 'border-l-red-500' : isCompleted ? 'border-l-emerald-500' : isAssigned ? 'border-l-blue-500' : 'border-l-amber-500'}`}>
                 <CardContent className="p-6 md:p-8">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                       <h3 className="font-bold text-2xl text-slate-900 tracking-tight">{order.service_device_type}</h3>
-                      <p className="text-slate-500 mt-1 font-medium">Duration: {order.duration_months} Months • Total: <span className="text-slate-900 font-bold">₹{order.locked_price.toLocaleString()}</span></p>
+                      <p className="text-slate-500 mt-1 font-medium">Duration: {formatDuration(order.start_date, order.end_date, order.duration_months)} • Total: <span className="text-slate-900 font-bold">₹{order.locked_price.toLocaleString()}</span></p>
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm ${
+                        isCancelled ? 'bg-red-100 text-red-700' : 
                         isCompleted ? 'bg-emerald-100 text-emerald-700' : 
                         isAssigned ? 'bg-blue-100 text-blue-700' : 
                         'bg-amber-100 text-amber-700'
                       }`}>
-                        {order.order_status}
+                        {isCancelled ? 'cancelled' : order.order_status}
                       </span>
                       {isAssigned && order.employee_id && assignedEmployees[order.employee_id] && (
-                        <div className="flex items-center gap-2 mt-2 bg-slate-50 border border-slate-100 p-1.5 pr-3 rounded-full">
-                          <div className="w-6 h-6 rounded-full overflow-hidden bg-slate-200 flex-shrink-0">
-                            {assignedEmployees[order.employee_id].avatar_url ? (
-                              <img src={assignedEmployees[order.employee_id].avatar_url!} alt="Employee" className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-xs font-bold text-slate-400">
-                                {assignedEmployees[order.employee_id].name?.charAt(0) || 'E'}
-                              </div>
-                            )}
+                        <div className="flex items-center gap-3 mt-2 bg-slate-50 border border-slate-100 p-2 pr-4 rounded-full">
+                          <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-200 flex-shrink-0">
+                            <img 
+                              src={assignedEmployees[order.employee_id].avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(assignedEmployees[order.employee_id].name || 'Employee')}&background=e0e7ff&color=4f46e5&size=128&bold=true`} 
+                              alt="Employee" 
+                              className="w-full h-full object-cover" 
+                            />
                           </div>
-                          <span className="text-xs font-bold text-slate-700">
+                          <span className="text-sm font-bold text-slate-700">
                             {assignedEmployees[order.employee_id].name}
                           </span>
+                          <a href={`tel:${assignedEmployees[order.employee_id].phone_number}`} className="flex items-center justify-center bg-indigo-100 text-indigo-700 hover:bg-indigo-200 p-1.5 rounded-full transition-colors ml-2">
+                            <PhoneCall className="w-3 h-3" />
+                          </a>
+                          <span className="text-xs font-bold text-slate-500 ml-1">
+                            {assignedEmployees[order.employee_id].phone_number}
+                          </span>
                         </div>
+                      )}
+                      {!isCompleted && !isCancelled && (
+                        <Button variant="outline" className="mt-4 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 w-full md:w-auto" onClick={() => handleCancelOrder(order.id)}>
+                          Cancel Appointment
+                        </Button>
                       )}
                     </div>
                   </div>
@@ -395,7 +442,7 @@ export function CustomerDashboard({ user }: Props) {
                   <div className="relative pt-6 pb-2">
                     <div className="absolute top-1/2 left-0 w-full h-1.5 bg-slate-100 -translate-y-1/2 z-0 rounded-full overflow-hidden">
                       <div 
-                        className={`h-full transition-all duration-1000 ease-out rounded-full ${isCompleted ? 'w-full bg-emerald-500' : isAssigned ? 'w-1/2 bg-blue-500' : 'w-0'}`} 
+                        className={`h-full transition-all duration-1000 ease-out rounded-full ${isCancelled ? 'w-full bg-red-500' : isCompleted ? 'w-full bg-emerald-500' : isAssigned ? 'w-1/2 bg-blue-500' : 'w-0'}`} 
                       />
                     </div>
                     
@@ -415,10 +462,12 @@ export function CustomerDashboard({ user }: Props) {
                       </div>
 
                       <div className="flex flex-col items-center">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm shadow-md transition-all duration-500 ${isCompleted ? 'bg-emerald-600 text-white ring-4 ring-emerald-50' : 'bg-white text-slate-400 border-2 border-slate-200'}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm shadow-md transition-all duration-500 ${isCancelled ? 'bg-red-600 text-white ring-4 ring-red-50' : isCompleted ? 'bg-emerald-600 text-white ring-4 ring-emerald-50' : 'bg-white text-slate-400 border-2 border-slate-200'}`}>
                           3
                         </div>
-                        <span className={`text-xs font-bold mt-3 uppercase tracking-wide transition-colors ${isCompleted ? 'text-slate-800' : 'text-slate-400'}`}>Completed</span>
+                        <span className={`text-xs font-bold mt-3 uppercase tracking-wide transition-colors ${isCancelled ? 'text-red-600' : isCompleted ? 'text-slate-800' : 'text-slate-400'}`}>
+                          {isCancelled ? 'Cancelled' : 'Completed'}
+                        </span>
                       </div>
                     </div>
                   </div>
