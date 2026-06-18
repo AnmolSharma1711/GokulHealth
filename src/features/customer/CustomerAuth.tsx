@@ -6,11 +6,14 @@ import { db } from '../../store/MockDatabase';
 import { Profile } from '../../types/database';
 import { hashMpin } from '../../utils/crypto';
 import { Lock, Phone, UserPlus, LogIn } from 'lucide-react';
+import { MpinInput } from '../../components/common/MpinInput';
+import { ForgotPassword } from '../../components/auth/ForgotPassword';
 
 export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void }) {
   const [phone, setPhone] = useState('');
   const [mpin, setMpin] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -62,6 +65,19 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
     }
   };
 
+  if (isForgotPassword) {
+    return (
+      <div className="flex items-center justify-center min-h-[80vh] p-4 relative animate-fade-in-up">
+        {/* Dynamic Background Elements */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+        </div>
+        <ForgotPassword onBack={() => setIsForgotPassword(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center justify-center min-h-[80vh] p-4 relative animate-fade-in-up">
       {/* Dynamic Background Elements */}
@@ -99,17 +115,11 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
               />
             </div>
             
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
-              </div>
-              <input
-                type="password"
-                placeholder="4-digit MPIN"
-                className="w-full pl-11 pr-4 py-3 bg-white/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all font-medium text-slate-900 tracking-widest"
-                value={mpin}
-                onChange={(e) => setMpin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-              />
+            <div className="text-center">
+              <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center justify-center gap-1">
+                <Lock className="w-4 h-4" /> Secure MPIN
+              </p>
+              <MpinInput length={4} value={mpin} onChange={setMpin} disabled={isLoading} />
             </div>
             
             {error && (
@@ -123,7 +133,7 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
             </Button>
             
             <div className="text-center mt-6">
-              <p className="text-slate-500 text-sm">
+              <p className="text-slate-500 text-sm mb-2">
                 {isRegistering ? 'Already have an account? ' : "Don't have an account? "}
                 <button
                   type="button"
@@ -136,6 +146,15 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
                   {isRegistering ? 'Login Instead' : 'Register Now'}
                 </button>
               </p>
+              {!isRegistering && (
+                <button
+                  type="button"
+                  onClick={() => setIsForgotPassword(true)}
+                  className="text-slate-400 hover:text-slate-600 text-sm font-medium transition-colors"
+                >
+                  Forgot your MPIN?
+                </button>
+              )}
             </div>
           </form>
         </CardContent>
