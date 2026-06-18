@@ -122,6 +122,7 @@ export class RealDatabase {
     const { data, error } = await supabase
       .from('profiles')
       .select('*, employee_details!inner(*)')
+      .eq('role', 'employee')
       .eq('employee_details.kyc_status', 'verified');
       
     if (error) return [];

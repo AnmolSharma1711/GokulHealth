@@ -36,7 +36,7 @@ export function EmployeeApp() {
 
   return (
     <div className="h-[100dvh] bg-slate-50 flex flex-col overflow-hidden">
-      <header className="bg-white border-b border-emerald-200 px-6 py-4 flex justify-between items-center shadow-sm shrink-0 z-10">
+      <header className="bg-white border-b border-emerald-200 px-6 py-4 pt-safe flex justify-between items-center shadow-sm shrink-0 z-10">
         <h1 className="text-xl font-bold text-emerald-600">Employee Portal</h1>
         <button 
           onClick={() => {

@@ -16,7 +16,7 @@ export function LandingPage() {
       <div className="max-w-5xl w-full relative z-10 animate-fade-in-up">
         <div className="text-center mb-16">
           <div className="inline-block mb-4 p-2 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl">
-            <img src="/icons/icon-128.webp" alt="JanSahayak Logo" className="w-20 h-20 rounded-xl" />
+            <img src="/favicon.png" alt="JanSahayak Logo" className="w-20 h-20 rounded-xl" />
           </div>
           <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight drop-shadow-lg">
             Jan<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-emerald-400">Sahayak</span>
