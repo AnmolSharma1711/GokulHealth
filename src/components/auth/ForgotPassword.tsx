@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Button } from './Button';
-import { Card, CardContent, CardHeader, CardTitle } from './Card';
+import { Button } from '../common/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '../common/Card';
 import { Phone, Mail, KeyRound, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { db } from '../../store/MockDatabase';
 import { hashMpin } from '../../utils/crypto';
-import { MpinInput } from './MpinInput';
+import { MpinInput } from '../common/MpinInput';
 
 interface Props {
   onBack: () => void;
