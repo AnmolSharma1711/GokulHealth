@@ -107,10 +107,20 @@ export function AdminApp() {
     e.preventDefault();
     if (!searchPhone) return;
     const user = await db.searchUserByPhone(searchPhone);
-    setSearchResult(user);
+    
     if (!user) {
       alert('User not found with this phone number.');
+      setSearchResult(null);
+      return;
     }
+
+    if (user.role === 'customer') {
+      alert('Customers cannot be promoted to Admin. Please search for an Employee.');
+      setSearchResult(null);
+      return;
+    }
+
+    setSearchResult(user);
   };
 
   const handleMakeAdmin = async (userId: string) => {
