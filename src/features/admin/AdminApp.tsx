@@ -84,15 +84,6 @@ export function AdminApp() {
   };
 
   const handleVerifyKyc = async (employeeId: string, status: 'verified' | 'rejected') => {
-    await db.saveEmployeeDetails({
-      id: employeeId,
-      experience: '', // mock partial update
-      shift_preference: 'morning',
-      kyc_status: status,
-      kyc_document_details: ''
-    } as any); // Simple mock for approval
-    
-    // Actually we need to fetch the existing and update. Let's do it properly via db:
     const existing = await db.getEmployeeDetails(employeeId);
     if (existing) {
       await db.saveEmployeeDetails({ ...existing, kyc_status: status });
