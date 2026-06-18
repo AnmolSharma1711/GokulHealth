@@ -159,6 +159,7 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
             </div>
           </div>
 
+          <div>
             <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1">
               <MapPin className="w-4 h-4" /> Location
             </label>
