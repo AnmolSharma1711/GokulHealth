@@ -273,9 +273,18 @@ export function AdminApp() {
                             {order.payment_status.toUpperCase()}
                           </span>
                         </div>
-                        <p className="text-sm text-slate-500 mb-4">
-                          Duration: {order.duration_months} Months • Customer Ref: {order.customer_id.substring(0,8)}
-                        </p>
+                        <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 mb-4 bg-white p-3 rounded-lg border border-slate-100">
+                          <div><span className="font-semibold text-slate-400 text-[10px] uppercase tracking-wider">Shift</span><br />{order.time_each_day || 'Not specified'}</div>
+                          <div><span className="font-semibold text-slate-400 text-[10px] uppercase tracking-wider">Patient Age</span><br />{order.patient_age || 'N/A'}</div>
+                          <div><span className="font-semibold text-slate-400 text-[10px] uppercase tracking-wider">Start</span><br />{order.start_date || 'N/A'}</div>
+                          <div><span className="font-semibold text-slate-400 text-[10px] uppercase tracking-wider">End</span><br />{order.end_date || 'N/A'}</div>
+                          {order.service_details && (
+                            <div className="col-span-2 mt-1 pt-2 border-t border-slate-100">
+                              <span className="font-semibold text-slate-400 text-[10px] uppercase tracking-wider">Details</span><br />
+                              <span className="italic text-xs">{order.service_details}</span>
+                            </div>
+                          )}
+                        </div>
                         
                         <div className="pt-3 border-t border-slate-100">
                           <p className="text-xs font-medium text-slate-500 mb-2">Available Employees to Assign:</p>
@@ -283,17 +292,22 @@ export function AdminApp() {
                             {verifiedEmployees.length === 0 ? (
                               <span className="text-xs text-red-500">No verified employees available!</span>
                             ) : (
-                              verifiedEmployees.map(emp => (
-                                <div key={emp.id} className="flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
-                                  <div>
-                                    <span className="text-sm font-medium text-slate-900 block">{emp.name}</span>
-                                    <span className="text-xs text-emerald-600 font-medium capitalize">{emp.shift_preference} Shift</span>
+                              verifiedEmployees.map(emp => {
+                                const isBusy = allOrders.some(o => o.employee_id === emp.id && o.order_status === 'assigned');
+                                return (
+                                  <div key={emp.id} className={`flex justify-between items-center p-2 rounded-lg border ${isBusy ? 'bg-red-50 border-red-100 opacity-75' : 'bg-slate-50 border-slate-100'}`}>
+                                    <div>
+                                      <span className="text-sm font-medium text-slate-900 block flex items-center gap-2">
+                                        {emp.name} {isBusy && <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">Busy</span>}
+                                      </span>
+                                      <span className="text-xs text-emerald-600 font-medium capitalize">{emp.shift_preference} Shift</span>
+                                    </div>
+                                    <Button size="sm" onClick={() => handleAssign(order.id, emp.id)} disabled={isBusy} className="bg-indigo-600 hover:bg-indigo-700 h-8 text-xs disabled:opacity-50">
+                                      Assign
+                                    </Button>
                                   </div>
-                                  <Button size="sm" onClick={() => handleAssign(order.id, emp.id)} className="bg-indigo-600 hover:bg-indigo-700 h-8 text-xs">
-                                    Assign
-                                  </Button>
-                                </div>
-                              ))
+                                );
+                              })
                             )}
                           </div>
                         </div>
@@ -312,22 +326,25 @@ export function AdminApp() {
                   </h3>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 grid gap-4 grid-cols-1 xl:grid-cols-2 content-start">
-                  {verifiedEmployees.map(emp => (
-                    <div key={emp.id} className="border border-slate-200 rounded-xl p-4 bg-slate-50">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-lg">
-                          {emp.name?.charAt(0) || 'E'}
+                  {verifiedEmployees.map(emp => {
+                    const isBusy = allOrders.some(o => o.employee_id === emp.id && o.order_status === 'assigned');
+                    return (
+                      <div key={emp.id} className={`border rounded-xl p-4 ${isBusy ? 'border-red-200 bg-red-50/30' : 'border-slate-200 bg-slate-50'}`}>
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${isBusy ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                            {emp.name?.charAt(0) || 'E'}
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-slate-900">{emp.name}</h4>
+                            <p className="text-xs text-slate-500 capitalize">{emp.shift_preference} Shift • {emp.experience}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-bold text-slate-900">{emp.name}</h4>
-                          <p className="text-xs text-slate-500 capitalize">{emp.shift_preference} Shift • {emp.experience}</p>
+                        <div className={`text-xs font-medium bg-white border rounded p-2 text-center ${isBusy ? 'text-red-600 border-red-200' : 'text-slate-500 border-slate-200'}`}>
+                          Status: {isBusy ? 'On a Job' : 'Ready for Jobs'}
                         </div>
                       </div>
-                      <div className="text-xs font-medium text-slate-500 bg-white border border-slate-200 rounded p-2 text-center">
-                        Status: Ready for Jobs
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
               

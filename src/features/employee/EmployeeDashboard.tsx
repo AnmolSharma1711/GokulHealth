@@ -104,7 +104,32 @@ export function EmployeeDashboard({ user, details }: Props) {
                 </div>
                 
                 <div className="space-y-6 mt-6 pt-6 border-t border-slate-100/50 relative">
-                  <div className="flex items-start gap-4">
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Patient Age</p>
+                      <p className="text-sm font-medium text-slate-900 mt-1">{job.patient_age || 'N/A'}</p>
+                    </div>
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Shift Timing</p>
+                      <p className="text-sm font-medium text-slate-900 mt-1">{job.time_each_day || 'Not specified'}</p>
+                    </div>
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Start Date</p>
+                      <p className="text-sm font-medium text-slate-900 mt-1">{job.start_date || 'N/A'}</p>
+                    </div>
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">End Date</p>
+                      <p className="text-sm font-medium text-slate-900 mt-1">{job.end_date || 'N/A'}</p>
+                    </div>
+                    {job.service_details && (
+                      <div className="col-span-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Additional Details</p>
+                        <p className="text-sm font-medium text-slate-900 mt-1 italic">{job.service_details}</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-start gap-4 mb-6">
                     <div className="bg-slate-50 p-2 rounded-xl mt-0.5">
                       <MapPin className="w-5 h-5 text-slate-400" />
                     </div>

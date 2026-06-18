@@ -25,7 +25,11 @@ export function CustomerDashboard({ user }: Props) {
   
   // Booking State
   const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [durationMonths, setDurationMonths] = useState<number>(1);
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  const [timeEachDay, setTimeEachDay] = useState<string>('Morning');
+  const [patientAge, setPatientAge] = useState<number | ''>('');
+  const [serviceDetails, setServiceDetails] = useState<string>('');
   const [isBooking, setIsBooking] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [pendingOrder, setPendingOrder] = useState<Order | null>(null);
@@ -49,9 +53,24 @@ export function CustomerDashboard({ user }: Props) {
   const activeService = SERVICES.find((s) => s.id === selectedService);
   
   const calculatePrice = () => {
-    if (!activeService) return 0;
-    const baseTotal = activeService.basePrice * durationMonths;
-    const discount = durationMonths >= 6 ? 0.15 : durationMonths >= 3 ? 0.10 : 0;
+    if (!activeService || !startDate || !endDate) return 0;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (end < start) return 0;
+    
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    
+    // basePrice is roughly per month (30 days)
+    const dailyRate = activeService.basePrice / 30;
+    let baseTotal = dailyRate * diffDays;
+    
+    // Adjust rate for 24 Hours shift
+    if (timeEachDay === '24 Hours') {
+      baseTotal *= 2;
+    }
+
+    const discount = diffDays >= 180 ? 0.15 : diffDays >= 90 ? 0.10 : 0;
     return Math.round(baseTotal * (1 - discount));
   };
 
@@ -61,12 +80,21 @@ export function CustomerDashboard({ user }: Props) {
     if (!activeService) return;
     setIsBooking(true);
     
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffDays = end >= start ? Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1 : 0;
+
     const newOrder: Order = {
       id: crypto.randomUUID(),
       customer_id: user.id,
       employee_id: null,
       service_device_type: activeService.title,
-      duration_months: durationMonths,
+      duration_months: Math.ceil(diffDays / 30) || 1,
+      start_date: startDate,
+      end_date: endDate,
+      time_each_day: timeEachDay,
+      patient_age: Number(patientAge) || 0,
+      service_details: serviceDetails,
       locked_price: lockedPrice,
       payment_status: 'paid', // We'll save it as paid only after Razorpay succeeds
       order_status: 'unassigned',
@@ -91,7 +119,11 @@ export function CustomerDashboard({ user }: Props) {
     setPendingOrder(null);
     setShowPayment(false);
     setSelectedService(null);
-    setDurationMonths(1);
+    setStartDate('');
+    setEndDate('');
+    setTimeEachDay('Morning');
+    setPatientAge('');
+    setServiceDetails('');
     setCurrentTab('orders');
     fetchMyOrders();
   };
@@ -211,23 +243,36 @@ export function CustomerDashboard({ user }: Props) {
                 <div className="p-8">
                   <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
                     <Clock className="w-5 h-5 text-primary-500" />
-                    Select Duration
+                    Service Details
                   </h3>
                   <div className="flex flex-col gap-4">
-                    <input
-                      type="range"
-                      min="1"
-                      max="12"
-                      value={durationMonths}
-                      onChange={(e) => setDurationMonths(parseInt(e.target.value))}
-                      className="w-full accent-primary-600 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
-                    />
-                    <div className="flex justify-between text-sm font-semibold text-slate-500">
-                      <span>1 Mo</span>
-                      <span className="text-primary-700 font-bold bg-primary-100 px-4 py-1 rounded-full shadow-sm">
-                        {durationMonths} Months
-                      </span>
-                      <span>12 Mo</span>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-1">Start Date</label>
+                        <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-1">End Date</label>
+                        <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-1">Shift Timing</label>
+                        <select value={timeEachDay} onChange={e => setTimeEachDay(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white">
+                          <option value="Morning">Morning</option>
+                          <option value="Evening">Evening</option>
+                          <option value="24 Hours">24 Hours</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-1">Patient Age</label>
+                        <input type="number" value={patientAge} onChange={e => setPatientAge(e.target.value ? parseInt(e.target.value) : '')} placeholder="e.g. 65" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 mb-1">Additional Requirements</label>
+                      <textarea value={serviceDetails} onChange={e => setServiceDetails(e.target.value)} placeholder="Type of service needed, medical conditions..." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white h-20 resize-none"></textarea>
                     </div>
                   </div>
                 </div>
@@ -242,19 +287,25 @@ export function CustomerDashboard({ user }: Props) {
                         ₹{lockedPrice.toLocaleString()}
                       </p>
                     </div>
-                    {durationMonths >= 3 && (
-                      <div className="bg-emerald-400 text-emerald-950 text-xs font-black px-3 py-1.5 rounded-lg shadow-lg transform rotate-3">
-                        {durationMonths >= 6 ? '15% OFF' : '10% OFF'}
-                      </div>
-                    )}
+                    {startDate && endDate && (() => {
+                      const days = Math.ceil(Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                      if (days >= 90) {
+                        return (
+                          <div className="bg-emerald-400 text-emerald-950 text-xs font-black px-3 py-1.5 rounded-lg shadow-lg transform rotate-3">
+                            {days >= 180 ? '15% OFF' : '10% OFF'}
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
                   </div>
                   
                   <Button 
                     fullWidth 
                     size="lg" 
                     onClick={handleCreateOrder}
-                    disabled={isBooking}
-                    className="bg-white text-primary-700 hover:bg-slate-50 shadow-xl shadow-black/10 py-6 text-lg relative z-10"
+                    disabled={isBooking || !startDate || !endDate || lockedPrice <= 0}
+                    className="bg-white text-primary-700 hover:bg-slate-50 shadow-xl shadow-black/10 py-6 text-lg relative z-10 disabled:opacity-50"
                   >
                     {isBooking ? 'Processing...' : 'Lock Price & Pay'}
                   </Button>

@@ -36,6 +36,11 @@ export interface Order {
   employee_id: string | null;
   service_device_type: string;
   duration_months: number;
+  start_date?: string;
+  end_date?: string;
+  time_each_day?: string;
+  patient_age?: number;
+  service_details?: string;
   locked_price: number;
   payment_status: PaymentStatus;
   order_status: OrderStatus;
