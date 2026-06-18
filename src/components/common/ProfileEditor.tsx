@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './Card';
 import { Button } from './Button';
 import { Input } from './Input';
 import { db } from '../../store/MockDatabase';
-import { User, MapPin } from 'lucide-react';
+import { User, MapPin, Upload } from 'lucide-react';
 
 interface Props {
   profile: Profile;
@@ -16,15 +16,32 @@ interface Props {
 export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props) {
   const [name, setName] = useState(profile.name || '');
   const [address, setAddress] = useState(profile.address || '');
+  const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || '');
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    setIsUploading(true);
+    try {
+      const url = await db.uploadAvatar(profile.id, file);
+      setAvatarUrl(url);
+    } catch (error) {
+      console.error('Failed to upload avatar:', error);
+      alert('Failed to upload avatar.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      await db.updateProfile(profile.id, { name, address });
+      await db.updateProfile(profile.id, { name, address, avatar_url: avatarUrl });
       if (onSave) {
-        onSave({ ...profile, name, address });
+        onSave({ ...profile, name, address, avatar_url: avatarUrl });
       }
       if (!isAdminEdit) {
         alert('Profile updated successfully!');
@@ -49,6 +66,24 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
         </div>
       </CardHeader>
       <CardContent className="p-6 md:p-8">
+        <div className="flex flex-col items-center mb-8 border-b border-slate-100 pb-8">
+          <div className="relative group cursor-pointer mb-4">
+            <div className={`w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden bg-slate-100 flex items-center justify-center ${isUploading ? 'opacity-50' : ''}`}>
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-10 h-10 text-slate-300" />
+              )}
+            </div>
+            <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+              <Upload className="w-6 h-6 mb-1" />
+              <span className="text-[10px] font-bold uppercase tracking-wider">Change</span>
+              <input type="file" accept="image/png, image/jpeg, image/jpg" className="hidden" onChange={handleAvatarChange} disabled={isUploading} />
+            </label>
+          </div>
+          {isUploading && <p className="text-sm font-medium text-indigo-600 animate-pulse">Uploading...</p>}
+        </div>
+
         <form onSubmit={handleSave} className="space-y-6">
           <div>
             <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Basic Info</label>

@@ -51,6 +51,19 @@ export class RealDatabase {
     if (error) throw new Error(error.message);
   }
 
+  async uploadAvatar(userId: string, file: File): Promise<string> {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${userId}-${Date.now()}.${fileExt}`;
+    const { error } = await supabase.storage
+      .from('avatars')
+      .upload(fileName, file, { upsert: true });
+
+    if (error) throw new Error(error.message);
+
+    const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
+    return data.publicUrl;
+  }
+
   // --- Customer ---
   async getCustomerDetails(id: string): Promise<CustomerDetails | null> {
     const { data, error } = await supabase.from('customer_details').select('*').eq('id', id).single();

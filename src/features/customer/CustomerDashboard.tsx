@@ -35,12 +35,22 @@ export function CustomerDashboard({ user }: Props) {
   const [showPayment, setShowPayment] = useState(false);
   const [pendingOrder, setPendingOrder] = useState<Order | null>(null);
 
-  // Orders State
   const [myOrders, setMyOrders] = useState<Order[]>([]);
+  const [assignedEmployees, setAssignedEmployees] = useState<Record<string, Profile>>({});
 
   const fetchMyOrders = async () => {
     const orders = await db.getOrdersByCustomer(user.id);
     setMyOrders(orders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
+    
+    const empIds = [...new Set(orders.map(o => o.employee_id).filter(Boolean))] as string[];
+    if (empIds.length > 0) {
+      const emps = await Promise.all(empIds.map(id => db.getProfileById(id)));
+      const empMap: Record<string, Profile> = {};
+      emps.forEach(emp => {
+        if (emp) empMap[emp.id] = emp;
+      });
+      setAssignedEmployees(empMap);
+    }
   };
 
   useEffect(() => {
@@ -354,13 +364,31 @@ export function CustomerDashboard({ user }: Props) {
                       <h3 className="font-bold text-2xl text-slate-900 tracking-tight">{order.service_device_type}</h3>
                       <p className="text-slate-500 mt-1 font-medium">Duration: {order.duration_months} Months • Total: <span className="text-slate-900 font-bold">₹{order.locked_price.toLocaleString()}</span></p>
                     </div>
-                    <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm ${
-                      isCompleted ? 'bg-emerald-100 text-emerald-700' : 
-                      isAssigned ? 'bg-blue-100 text-blue-700' : 
-                      'bg-amber-100 text-amber-700'
-                    }`}>
-                      {order.order_status}
-                    </span>
+                    <div className="flex flex-col items-end gap-2">
+                      <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm ${
+                        isCompleted ? 'bg-emerald-100 text-emerald-700' : 
+                        isAssigned ? 'bg-blue-100 text-blue-700' : 
+                        'bg-amber-100 text-amber-700'
+                      }`}>
+                        {order.order_status}
+                      </span>
+                      {isAssigned && order.employee_id && assignedEmployees[order.employee_id] && (
+                        <div className="flex items-center gap-2 mt-2 bg-slate-50 border border-slate-100 p-1.5 pr-3 rounded-full">
+                          <div className="w-6 h-6 rounded-full overflow-hidden bg-slate-200 flex-shrink-0">
+                            {assignedEmployees[order.employee_id].avatar_url ? (
+                              <img src={assignedEmployees[order.employee_id].avatar_url!} alt="Employee" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-xs font-bold text-slate-400">
+                                {assignedEmployees[order.employee_id].name?.charAt(0) || 'E'}
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-xs font-bold text-slate-700">
+                            {assignedEmployees[order.employee_id].name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Tracking Timeline */}
