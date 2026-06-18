@@ -6,6 +6,8 @@ import { EmployeeApp } from './features/employee/EmployeeApp';
 import { AdminApp } from './features/admin/AdminApp';
 import { LandingPage } from './features/auth/LandingPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { ThemeToggle } from './components/common/ThemeToggle';
 
 function RequireAuth({ role, children }: { role: 'customer' | 'employee' | 'admin', children: JSX.Element }) {
   const { session, isLoading } = useAuth();
@@ -110,9 +112,12 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <ThemeToggle />
+        <AppRoutes />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

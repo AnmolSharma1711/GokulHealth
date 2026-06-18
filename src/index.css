@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased overflow-x-hidden;
+    @apply bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-50 font-sans antialiased overflow-x-hidden transition-colors duration-300;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -14,19 +14,19 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-sm;
+    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-white/40 dark:border-slate-700/50 shadow-sm;
   }
   .glass-dark {
     @apply bg-slate-900/80 backdrop-blur-lg border border-slate-700/50 shadow-xl;
   }
   .glass-card {
-    @apply bg-white/80 backdrop-blur-xl border border-white/60 shadow-lg shadow-primary-900/5 transition-all duration-300;
+    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/60 dark:border-slate-700/60 shadow-lg shadow-primary-900/5 dark:shadow-black/20 transition-all duration-300;
   }
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-indigo-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-indigo-500 dark:from-primary-400 dark:to-indigo-400;
   }
   .text-gradient-brand {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-400 dark:from-emerald-400 dark:to-teal-300;
   }
   .pb-safe {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
@@ -45,8 +45,8 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full;
+  @apply bg-slate-300 dark:bg-slate-700 rounded-full;
 }
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-400;
+  @apply bg-slate-400 dark:bg-slate-600;
 }

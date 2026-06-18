@@ -194,7 +194,7 @@ export function EmployeeDashboard({ user, details }: Props) {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-white/50 px-6 pt-4 flex justify-around items-center z-50 pb-safe shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] rounded-t-3xl">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-white/50 dark:border-slate-800 px-6 pt-4 flex justify-around items-center z-50 pb-safe shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-black/20 rounded-t-3xl transition-colors duration-300">
         <button 
           onClick={() => setView('active')}
           className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${view === 'active' ? 'text-emerald-600 transform -translate-y-1' : 'text-slate-400 hover:text-slate-600'}`}

@@ -56,7 +56,7 @@ export function MpinInput({ length = 4, value, onChange, disabled = false }: Pro
           onChange={(e) => handleChange(e, idx)}
           onKeyDown={(e) => handleKeyDown(e, idx)}
           disabled={disabled}
-          className="w-14 h-14 rounded-full bg-white border-2 border-slate-200 text-center text-2xl font-black text-slate-800 shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all outline-none selection:bg-transparent disabled:opacity-50"
+          className="w-14 h-14 rounded-full bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-center text-2xl font-black text-slate-800 dark:text-white shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/30 transition-all outline-none selection:bg-transparent disabled:opacity-50"
         />
       ))}
     </div>

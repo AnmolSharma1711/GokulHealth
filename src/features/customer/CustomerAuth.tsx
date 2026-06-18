@@ -79,26 +79,26 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
   }
 
   return (
-    <div className="flex items-center justify-center min-h-[80vh] p-4 relative animate-fade-in-up">
+    <div className="flex items-center justify-center min-h-[80vh] p-4 relative animate-fade-in-up transition-colors duration-300">
       {/* Dynamic Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow"></div>
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
       </div>
 
-      <Card className="w-full max-w-md glass-card relative z-10 border-primary-100 shadow-2xl shadow-primary-900/10">
+      <Card className="w-full max-w-md glass-card dark:glass-dark relative z-10 border-primary-100 dark:border-primary-500/30 shadow-2xl shadow-primary-900/10 dark:shadow-primary-900/50 transition-all duration-300">
         <CardHeader className="pt-8 pb-4 text-center">
-          <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-4 rotate-3 shadow-inner">
+          <div className="w-16 h-16 bg-primary-50 dark:bg-primary-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 rotate-3 shadow-inner dark:border dark:border-primary-500/30">
             {isRegistering ? (
               <UserPlus className="w-8 h-8 text-primary-600" />
             ) : (
               <LogIn className="w-8 h-8 text-primary-600" />
             )}
           </div>
-          <CardTitle className="text-3xl font-black text-slate-900 tracking-tight">
+          <CardTitle className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             {isRegistering ? 'Create Account' : 'Welcome Back'}
           </CardTitle>
-          <p className="text-slate-500 mt-2 font-medium">Customer Portal</p>
+          <p className="text-slate-500 dark:text-primary-200/60 mt-2 font-medium">Customer Portal</p>
         </CardHeader>
         <CardContent className="p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -109,7 +109,7 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
               <input
                 type="tel"
                 placeholder="10-digit mobile number"
-                className="w-full pl-11 pr-4 py-3 bg-white/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all font-medium text-slate-900"
+                className="w-full pl-11 pr-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all font-medium text-slate-900 dark:text-white dark:placeholder-slate-500"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
               />
@@ -123,7 +123,7 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
             </div>
             
             {error && (
-              <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg border border-red-100 font-medium text-center">
+              <div className="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-sm p-3 rounded-lg border border-red-100 dark:border-red-500/20 font-medium text-center">
                 {error}
               </div>
             )}
@@ -133,7 +133,7 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
             </Button>
             
             <div className="text-center mt-6">
-              <p className="text-slate-500 text-sm mb-2">
+              <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">
                 {isRegistering ? 'Already have an account? ' : "Don't have an account? "}
                 <button
                   type="button"
@@ -141,7 +141,7 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
                     setIsRegistering(!isRegistering);
                     setError('');
                   }}
-                  className="text-primary-600 font-bold hover:underline transition-all"
+                  className="text-primary-600 dark:text-primary-400 font-bold hover:underline transition-all"
                 >
                   {isRegistering ? 'Login Instead' : 'Register Now'}
                 </button>
@@ -150,7 +150,7 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
                 <button
                   type="button"
                   onClick={() => setIsForgotPassword(true)}
-                  className="text-slate-400 hover:text-slate-600 text-sm font-medium transition-colors"
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-sm font-medium transition-colors"
                 >
                   Forgot your MPIN?
                 </button>

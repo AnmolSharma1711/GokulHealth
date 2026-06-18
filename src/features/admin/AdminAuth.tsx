@@ -45,11 +45,11 @@ export function AdminAuth({ onLogin }: Props) {
 
   if (isForgotPassword) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-4 relative animate-fade-in-up bg-slate-50">
+      <div className="flex items-center justify-center min-h-screen p-4 relative animate-fade-in-up bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
         {/* Dynamic Background Elements */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-indigo-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-pulse-slow"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-indigo-200 dark:bg-indigo-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] opacity-40 dark:opacity-20 animate-pulse-slow"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-200 dark:bg-purple-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] opacity-40 dark:opacity-20 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
         </div>
         <ForgotPassword onBack={() => setIsForgotPassword(false)} />
       </div>
@@ -57,22 +57,22 @@ export function AdminAuth({ onLogin }: Props) {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 relative animate-fade-in-up bg-slate-50">
+    <div className="flex items-center justify-center min-h-screen p-4 relative animate-fade-in-up bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       {/* Dynamic Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-indigo-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-pulse-slow"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-indigo-200 dark:bg-indigo-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] opacity-40 dark:opacity-20 animate-pulse-slow"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-200 dark:bg-purple-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] opacity-40 dark:opacity-20 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
       </div>
 
-      <Card className="w-full max-w-md glass-card relative z-10 border-indigo-100 shadow-2xl shadow-indigo-900/10">
+      <Card className="w-full max-w-md glass-card dark:glass-dark relative z-10 border-indigo-100 dark:border-indigo-500/30 shadow-2xl shadow-indigo-900/10 dark:shadow-indigo-900/50 transition-all duration-300">
         <CardHeader className="pt-8 pb-4 text-center">
-          <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner border border-indigo-100">
-            <Shield className="w-8 h-8 text-indigo-600" />
+          <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner border border-indigo-100 dark:border-indigo-500/30">
+            <Shield className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
           </div>
-          <CardTitle className="text-3xl font-black text-slate-900 tracking-tight">
+          <CardTitle className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             Admin Portal
           </CardTitle>
-          <p className="text-slate-500 mt-2 font-medium">Secure Access Required</p>
+          <p className="text-slate-500 dark:text-indigo-200/60 mt-2 font-medium">Secure Access Required</p>
         </CardHeader>
         <CardContent className="p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -83,7 +83,7 @@ export function AdminAuth({ onLogin }: Props) {
               <input
                 type="tel"
                 placeholder="Admin Phone Number"
-                className="w-full pl-11 pr-4 py-3 bg-white/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-medium text-slate-900 placeholder-slate-400"
+                className="w-full pl-11 pr-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-medium text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
               />
@@ -97,7 +97,7 @@ export function AdminAuth({ onLogin }: Props) {
             </div>
             
             {error && (
-              <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg border border-red-100 font-medium text-center">
+              <div className="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-sm p-3 rounded-lg border border-red-100 dark:border-red-500/20 font-medium text-center">
                 {error}
               </div>
             )}
@@ -110,7 +110,7 @@ export function AdminAuth({ onLogin }: Props) {
               <button
                 type="button"
                 onClick={() => setIsForgotPassword(true)}
-                className="text-slate-400 hover:text-slate-600 text-sm font-medium transition-colors"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-sm font-medium transition-colors"
               >
                 Forgot your MPIN?
               </button>
