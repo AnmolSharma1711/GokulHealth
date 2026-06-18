@@ -16,9 +16,26 @@ interface Props {
 export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props) {
   const [name, setName] = useState(profile.name || '');
   const [address, setAddress] = useState(profile.address || '');
+  const [dob, setDob] = useState(profile.dob || '');
+  const [email, setEmail] = useState(profile.email || '');
+  const [gender, setGender] = useState(profile.gender || '');
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || '');
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  const isCustomer = profile.role === 'customer';
+
+  const calculateAge = (dobString: string) => {
+    if (!dobString) return '';
+    const birthDate = new Date(dobString);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age.toString();
+  };
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -39,9 +56,9 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
     e.preventDefault();
     setIsSaving(true);
     try {
-      await db.updateProfile(profile.id, { name, address, avatar_url: avatarUrl });
+      await db.updateProfile(profile.id, { name, address, avatar_url: avatarUrl, dob, email, gender });
       if (onSave) {
-        onSave({ ...profile, name, address, avatar_url: avatarUrl });
+        onSave({ ...profile, name, address, avatar_url: avatarUrl, dob, email, gender });
       }
       if (!isAdminEdit) {
         alert('Profile updated successfully!');
@@ -66,36 +83,82 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
         </div>
       </CardHeader>
       <CardContent className="p-6 md:p-8">
-        <div className="flex flex-col items-center mb-8 border-b border-slate-100 pb-8">
-          <div className="relative group cursor-pointer mb-4">
-            <div className={`w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden bg-slate-100 flex items-center justify-center ${isUploading ? 'opacity-50' : ''}`}>
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-              ) : (
-                <User className="w-10 h-10 text-slate-300" />
-              )}
+        {!isCustomer && (
+          <div className="flex flex-col items-center mb-8 border-b border-slate-100 pb-8">
+            <div className="relative group cursor-pointer mb-4">
+              <div className={`w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden bg-slate-100 flex items-center justify-center ${isUploading ? 'opacity-50' : ''}`}>
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-10 h-10 text-slate-300" />
+                )}
+              </div>
+              <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                <Upload className="w-6 h-6 mb-1" />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Change</span>
+                <input type="file" accept="image/png, image/jpeg, image/jpg" className="hidden" onChange={handleAvatarChange} disabled={isUploading} />
+              </label>
             </div>
-            <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-              <Upload className="w-6 h-6 mb-1" />
-              <span className="text-[10px] font-bold uppercase tracking-wider">Change</span>
-              <input type="file" accept="image/png, image/jpeg, image/jpg" className="hidden" onChange={handleAvatarChange} disabled={isUploading} />
-            </label>
+            {isUploading && <p className="text-sm font-medium text-indigo-600 animate-pulse">Uploading...</p>}
           </div>
-          {isUploading && <p className="text-sm font-medium text-indigo-600 animate-pulse">Uploading...</p>}
-        </div>
+        )}
 
         <form onSubmit={handleSave} className="space-y-6">
-          <div>
-            <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Basic Info</label>
-            <Input
-              label="Full Name"
-              placeholder="e.g. Jane Doe"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Phone Number</label>
+              <Input value={profile.phone_number} readOnly className="bg-slate-50 text-slate-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Email Address</label>
+              <Input
+                type="email"
+                placeholder="e.g. user@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Full Name</label>
+              <Input
+                placeholder="e.g. Jane Doe"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Gender</label>
+              <select
+                className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Date of Birth</label>
+              <Input
+                type="date"
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Age</label>
+              <Input
+                value={calculateAge(dob) ? `${calculateAge(dob)} years` : ''}
+                readOnly
+                placeholder="Auto-calculated"
+                className="bg-slate-50 text-slate-500"
+              />
+            </div>
           </div>
-          <div>
+
             <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1">
               <MapPin className="w-4 h-4" /> Location
             </label>

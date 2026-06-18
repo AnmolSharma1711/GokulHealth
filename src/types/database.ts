@@ -8,6 +8,9 @@ export interface Profile {
   name: string | null;
   address: string | null;
   avatar_url: string | null;
+  dob: string | null;
+  email: string | null;
+  gender: string | null;
   created_at: string;
 }
 

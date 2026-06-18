@@ -492,7 +492,9 @@ export function AdminApp() {
                       <p className="text-sm text-emerald-700">Phone: {searchResult.phone_number}</p>
                       <p className="text-xs font-medium text-emerald-600 mt-1 uppercase tracking-wide">Current Role: {searchResult.role}</p>
                     </div>
-                    {searchResult.role !== 'admin' ? (
+                    {searchResult.role === 'customer' ? (
+                      <span className="text-red-600 font-bold px-4 text-sm text-right">Cannot promote Customer</span>
+                    ) : searchResult.role !== 'admin' ? (
                       <Button onClick={() => handleMakeAdmin(searchResult.id)} className="bg-emerald-600 hover:bg-emerald-700">
                         Make Admin
                       </Button>

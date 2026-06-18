@@ -165,6 +165,9 @@ export class RealDatabase {
   }
 
   async deleteUser(id: string): Promise<void> {
+    await supabase.from('customer_details').delete().eq('id', id);
+    await supabase.from('employee_details').delete().eq('id', id);
+    await supabase.from('orders').delete().or(`customer_id.eq.${id},employee_id.eq.${id}`);
     await supabase.from('profiles').delete().eq('id', id);
   }
 
