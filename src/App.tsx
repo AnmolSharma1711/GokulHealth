@@ -7,7 +7,6 @@ import { AdminApp } from './features/admin/AdminApp';
 import { LandingPage } from './features/auth/LandingPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { ThemeToggle } from './components/common/ThemeToggle';
 
 function RequireAuth({ role, children }: { role: 'customer' | 'employee' | 'admin', children: JSX.Element }) {
   const { session, isLoading } = useAuth();
@@ -57,6 +56,16 @@ function BackButtonHandler() {
 }
 
 import { useNotifications } from './hooks/useNotifications';
+
+function BackgroundEffects() {
+  return (
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 hidden dark:block transition-opacity duration-1000">
+      <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary-600/30 blur-[120px] mix-blend-screen animate-pulse-slow"></div>
+      <div className="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-emerald-500/20 blur-[120px] mix-blend-screen animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[50%] rounded-full bg-indigo-500/20 blur-[120px] mix-blend-screen animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+    </div>
+  );
+}
 
 function AppRoutes() {
   const { session, isLoading } = useAuth();
@@ -114,8 +123,12 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <ThemeToggle />
-        <AppRoutes />
+        <div className="relative min-h-screen">
+          <BackgroundEffects />
+          <div className="relative z-10">
+            <AppRoutes />
+          </div>
+        </div>
       </AuthProvider>
     </ThemeProvider>
   );

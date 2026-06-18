@@ -217,8 +217,8 @@ export function CustomerDashboard({ user }: Props) {
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse-slow"></div>
           <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse-slow"></div>
           <div className="relative">
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Book a Service</h2>
-            <p className="text-slate-500 mt-2 text-lg">Select what you need and lock in your guaranteed price.</p>
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Book a Service</h2>
+            <p className="text-slate-500 dark:text-slate-300 mt-2 text-lg">Select what you need and lock in your guaranteed price.</p>
           </div>
         </div>
 
@@ -232,58 +232,58 @@ export function CustomerDashboard({ user }: Props) {
                 onClick={() => setSelectedService(service.id)}
                 className={`p-5 rounded-2xl border text-left transition-all duration-300 flex flex-col items-start relative overflow-hidden ${
                   isSelected 
-                    ? 'border-primary-500 ring-4 ring-primary-500/20 bg-primary-50 shadow-lg shadow-primary-900/5 -translate-y-1' 
-                    : 'border-white/60 bg-white/40 backdrop-blur-md hover:border-primary-300 hover:shadow-md hover:-translate-y-0.5'
+                    ? 'border-primary-500 ring-4 ring-primary-500/20 dark:ring-primary-500/40 bg-primary-50 dark:bg-primary-900/30 shadow-lg shadow-primary-900/5 dark:shadow-primary-900/50 -translate-y-1' 
+                    : 'border-white/60 dark:border-slate-700/50 bg-white/40 dark:bg-slate-800/40 backdrop-blur-md hover:border-primary-300 dark:hover:border-primary-500 hover:shadow-md hover:-translate-y-0.5'
                 }`}
               >
-                {isSelected && <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-50"></div>}
-                <div className={`p-3 rounded-xl mb-4 ${isSelected ? 'bg-primary-100' : 'bg-slate-100'}`}>
-                  <Icon className={`w-6 h-6 ${isSelected ? 'text-primary-600' : 'text-slate-500'}`} />
+                {isSelected && <div className="absolute inset-0 bg-gradient-to-br from-white/40 dark:from-white/10 to-transparent opacity-50"></div>}
+                <div className={`p-3 rounded-xl mb-4 ${isSelected ? 'bg-primary-100 dark:bg-primary-500/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                  <Icon className={`w-6 h-6 ${isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-slate-500 dark:text-slate-400'}`} />
                 </div>
-                <h3 className="font-bold text-sm text-slate-900 leading-tight z-10">{service.title}</h3>
-                <p className="text-xs text-slate-500 mt-1 font-medium z-10">₹{service.basePrice.toLocaleString()}/mo</p>
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white leading-tight z-10">{service.title}</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium z-10">₹{service.basePrice.toLocaleString()}/mo</p>
               </button>
             );
           })}
         </div>
 
         {selectedService && activeService && (
-          <Card className="glass-card border-primary-100 rounded-3xl overflow-hidden mt-8 animate-fade-in-up">
+          <Card className="glass-card dark:glass-dark border-primary-100 dark:border-primary-500/30 rounded-3xl overflow-hidden mt-8 animate-fade-in-up">
             <CardContent className="p-1">
-              <div className="grid md:grid-cols-2 gap-0 bg-gradient-to-br from-white/60 to-slate-50/60 rounded-3xl overflow-hidden">
+              <div className="grid md:grid-cols-2 gap-0 bg-gradient-to-br from-white/60 dark:from-slate-800/40 to-slate-50/60 dark:to-slate-900/40 rounded-3xl overflow-hidden">
                 <div className="p-8">
-                  <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-primary-500" />
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-primary-500 dark:text-primary-400" />
                     Service Details
                   </h3>
                   <div className="flex flex-col gap-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">Start Date</label>
-                        <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white" />
+                        <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Start Date</label>
+                        <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">End Date</label>
-                        <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white" />
+                        <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">End Date</label>
+                        <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">Shift Timing</label>
-                        <select value={timeEachDay} onChange={e => setTimeEachDay(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white">
+                        <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Shift Timing</label>
+                        <select value={timeEachDay} onChange={e => setTimeEachDay(e.target.value)} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                           <option value="Morning">Morning</option>
                           <option value="Evening">Evening</option>
                           <option value="24 Hours">24 Hours</option>
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">Patient Age</label>
-                        <input type="number" value={patientAge} onChange={e => setPatientAge(e.target.value ? parseInt(e.target.value) : '')} placeholder="e.g. 65" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white" />
+                        <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Patient Age</label>
+                        <input type="number" value={patientAge} onChange={e => setPatientAge(e.target.value ? parseInt(e.target.value) : '')} placeholder="e.g. 65" className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">Additional Requirements</label>
-                      <textarea value={serviceDetails} onChange={e => setServiceDetails(e.target.value)} placeholder="Type of service needed, medical conditions..." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white h-20 resize-none"></textarea>
+                      <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Additional Requirements</label>
+                      <textarea value={serviceDetails} onChange={e => setServiceDetails(e.target.value)} placeholder="Type of service needed, medical conditions..." className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white h-20 resize-none"></textarea>
                     </div>
                   </div>
                 </div>

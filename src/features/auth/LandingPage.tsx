@@ -5,13 +5,7 @@ export function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center p-4 py-12 md:py-4 relative transition-colors duration-300">
-      {/* Dynamic Background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary-200/50 dark:bg-primary-600/30 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-pulse-slow"></div>
-        <div className="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-emerald-200/50 dark:bg-emerald-500/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[50%] rounded-full bg-indigo-200/50 dark:bg-indigo-500/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
-      </div>
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 py-12 md:py-4 relative transition-colors duration-300">
 
       <div className="max-w-5xl w-full relative z-10 animate-fade-in-up">
         <div className="text-center mb-16">

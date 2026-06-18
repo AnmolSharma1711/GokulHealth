@@ -32,17 +32,29 @@ export function ForgotPassword({ onBack }: Props) {
     setStep(2);
   };
 
-  const handleSendOtp = () => {
-    // Simulate sending OTP
-    setStep(3);
-  };
-
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (otp.length !== 6) return setError('Enter 6-digit OTP');
     // Simulate OTP success (any 6 digits works)
     setStep(4);
+  };
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const newOtp = otp.split('');
+    newOtp[index] = value;
+    const joined = newOtp.join('');
+    setOtp(joined);
+    if (value && index < 5) {
+      document.getElementById(`otp-${index + 1}`)?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      document.getElementById(`otp-${index - 1}`)?.focus();
+    }
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -119,7 +131,7 @@ export function ForgotPassword({ onBack }: Props) {
             <div className="space-y-4">
               <button
                 type="button"
-                onClick={() => { setRecoveryMethod('sms'); setStep(3); }}
+                onClick={() => { setMethod('sms'); setStep(3); }}
                 className="w-full flex items-center justify-between p-4 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-primary-500 dark:hover:border-primary-500 transition-all group"
               >
                 <div className="flex items-center gap-3">
@@ -134,7 +146,7 @@ export function ForgotPassword({ onBack }: Props) {
               </button>
               <button
                 type="button"
-                onClick={() => { setRecoveryMethod('email'); setStep(3); }}
+                onClick={() => { setMethod('email'); setStep(3); }}
                 className="w-full flex items-center justify-between p-4 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-primary-500 dark:hover:border-primary-500 transition-all group"
               >
                 <div className="flex items-center gap-3">

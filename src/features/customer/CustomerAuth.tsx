@@ -42,6 +42,10 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
           role: 'customer',
           name: null,
           address: null,
+          avatar_url: null,
+          dob: null,
+          email: null,
+          gender: null,
           created_at: new Date().toISOString()
         };
         await db.registerProfile(newProfile);
@@ -68,11 +72,6 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
   if (isForgotPassword) {
     return (
       <div className="flex items-center justify-center min-h-[80vh] p-4 relative animate-fade-in-up">
-        {/* Dynamic Background Elements */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
-        </div>
         <ForgotPassword onBack={() => setIsForgotPassword(false)} />
       </div>
     );
@@ -80,11 +79,6 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
 
   return (
     <div className="flex items-center justify-center min-h-[80vh] p-4 relative animate-fade-in-up transition-colors duration-300">
-      {/* Dynamic Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
-      </div>
 
       <Card className="w-full max-w-md glass-card dark:glass-dark relative z-10 border-primary-100 dark:border-primary-500/30 shadow-2xl shadow-primary-900/10 dark:shadow-primary-900/50 transition-all duration-300">
         <CardHeader className="pt-8 pb-4 text-center">

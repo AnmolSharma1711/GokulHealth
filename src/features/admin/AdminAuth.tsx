@@ -45,25 +45,14 @@ export function AdminAuth({ onLogin }: Props) {
 
   if (isForgotPassword) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-4 relative animate-fade-in-up bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-        {/* Dynamic Background Elements */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-indigo-200 dark:bg-indigo-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] opacity-40 dark:opacity-20 animate-pulse-slow"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-200 dark:bg-purple-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] opacity-40 dark:opacity-20 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
-        </div>
+      <div className="flex items-center justify-center min-h-screen p-4 relative animate-fade-in-up transition-colors duration-300">
         <ForgotPassword onBack={() => setIsForgotPassword(false)} />
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 relative animate-fade-in-up bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-      {/* Dynamic Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-indigo-200 dark:bg-indigo-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] opacity-40 dark:opacity-20 animate-pulse-slow"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-200 dark:bg-purple-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] opacity-40 dark:opacity-20 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
-      </div>
-
+    <div className="flex items-center justify-center min-h-screen p-4 relative animate-fade-in-up transition-colors duration-300">
       <Card className="w-full max-w-md glass-card dark:glass-dark relative z-10 border-indigo-100 dark:border-indigo-500/30 shadow-2xl shadow-indigo-900/10 dark:shadow-indigo-900/50 transition-all duration-300">
         <CardHeader className="pt-8 pb-4 text-center">
           <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner border border-indigo-100 dark:border-indigo-500/30">

@@ -30,16 +30,16 @@ export function CustomerApp() {
   const needsProfileSetup = !user.name || !user.address || !details;
 
   return (
-    <div className="h-[100dvh] bg-slate-50 flex flex-col overflow-hidden">
-      <header className="bg-white border-b border-slate-200 px-6 py-4 pt-safe flex justify-between items-center shadow-sm shrink-0 z-10">
-        <h1 className="text-xl font-bold text-primary-600">Customer Portal</h1>
+    <div className="h-[100dvh] bg-slate-50 dark:bg-transparent flex flex-col overflow-hidden transition-colors duration-300">
+      <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-4 pt-safe flex justify-between items-center shadow-sm shrink-0 z-10">
+        <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400">Customer Portal</h1>
         <button 
           onClick={() => {
             setDetails(null);
             logout();
             navigate('/');
           }}
-          className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
+          className="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
         >
           Logout
         </button>

@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from './Card';
 import { Button } from './Button';
 import { Input } from './Input';
 import { db } from '../../store/MockDatabase';
-import { User, MapPin, Upload } from 'lucide-react';
+import { User, MapPin, Upload, Moon, Sun } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 interface Props {
   profile: Profile;
@@ -22,6 +23,7 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || '');
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const isCustomer = profile.role === 'customer';
 
@@ -72,10 +74,10 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto glass-card shadow-xl border-slate-200 animate-fade-in-up">
-      <CardHeader className="bg-slate-50/50 border-b border-slate-100/50 pb-6">
+    <Card className="w-full max-w-2xl mx-auto glass-card dark:glass-dark shadow-xl border-slate-200 dark:border-slate-700/50 animate-fade-in-up">
+      <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700/50/50 dark:border-slate-700/50 pb-6">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-2xl font-black text-slate-900 flex items-center gap-2">
+          <CardTitle className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
             <User className="w-6 h-6 text-indigo-500" />
             {isAdminEdit ? `Edit User: ${profile.phone_number}` : 'My Profile'}
           </CardTitle>
@@ -84,9 +86,9 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
       </CardHeader>
       <CardContent className="p-6 md:p-8">
         {!isCustomer && (
-          <div className="flex flex-col items-center mb-8 border-b border-slate-100 pb-8">
+          <div className="flex flex-col items-center mb-8 border-b border-slate-100 dark:border-slate-700/50 pb-8">
             <div className="relative group cursor-pointer mb-4">
-              <div className={`w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden bg-slate-100 flex items-center justify-center ${isUploading ? 'opacity-50' : ''}`}>
+              <div className={`w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center ${isUploading ? 'opacity-50' : ''}`}>
                 {avatarUrl ? (
                   <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
@@ -106,11 +108,11 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
         <form onSubmit={handleSave} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Phone Number</label>
-              <Input value={profile.phone_number} readOnly className="bg-slate-50 text-slate-500" />
+              <label className="block text-sm font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest mb-2">Phone Number</label>
+              <Input value={profile.phone_number} readOnly className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-300" />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Email Address</label>
+              <label className="block text-sm font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest mb-2">Email Address</label>
               <Input
                 type="email"
                 placeholder="e.g. user@example.com"
@@ -119,7 +121,7 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Full Name</label>
+              <label className="block text-sm font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest mb-2">Full Name</label>
               <Input
                 placeholder="e.g. Jane Doe"
                 value={name}
@@ -128,9 +130,9 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Gender</label>
+              <label className="block text-sm font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest mb-2">Gender</label>
               <select
-                className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                className="flex h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 dark:text-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
               >
@@ -141,7 +143,7 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Date of Birth</label>
+              <label className="block text-sm font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest mb-2">Date of Birth</label>
               <Input
                 type="date"
                 value={dob}
@@ -149,22 +151,22 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Age</label>
+              <label className="block text-sm font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest mb-2">Age</label>
               <Input
                 value={calculateAge(dob) ? `${calculateAge(dob)} years` : ''}
                 readOnly
                 placeholder="Auto-calculated"
-                className="bg-slate-50 text-slate-500"
+                className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-300"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1">
+            <label className="block text-sm font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest mb-2 flex items-center gap-1">
               <MapPin className="w-4 h-4" /> Location
             </label>
             <textarea
-              className="flex min-h-[100px] w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all shadow-sm"
+              className="flex min-h-[100px] w-full rounded-2xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 dark:text-white px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all shadow-sm"
               placeholder="Enter complete residential address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
@@ -172,9 +174,31 @@ export function ProfileEditor({ profile, onSave, isAdminEdit, onCancel }: Props)
             />
           </div>
 
-          <div className="pt-4 border-t border-slate-100 flex gap-4">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-700/50 dark:border-slate-800">
+            <label className="block text-sm font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest mb-4">App Preferences</label>
+            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 dark:border-slate-700 rounded-2xl">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                  {theme === 'light' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                </div>
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white dark:text-white">Dark Mode</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-300 dark:text-slate-400">Toggle dark theme appearance</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className={`w-14 h-8 rounded-full transition-colors relative flex items-center px-1 ${theme === 'dark' ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-600'}`}
+              >
+                <div className={`w-6 h-6 rounded-full bg-white dark:bg-slate-800/50 dark:text-white shadow-md transform transition-transform ${theme === 'dark' ? 'translate-x-6' : 'translate-x-0'}`}></div>
+              </button>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-700/50 flex gap-4">
             {isAdminEdit && onCancel && (
-              <Button type="button" variant="outline" className="flex-1 border-slate-200 text-slate-600 hover:bg-slate-50" onClick={onCancel}>
+              <Button type="button" variant="outline" className="flex-1 border-slate-200 dark:border-slate-700/50 text-slate-600 hover:bg-slate-50" onClick={onCancel}>
                 Cancel
               </Button>
             )}

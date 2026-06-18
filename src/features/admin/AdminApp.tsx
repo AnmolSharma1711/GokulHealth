@@ -134,8 +134,7 @@ export function AdminApp() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
-      
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50 dark:bg-transparent flex flex-col md:flex-row transition-colors duration-300">
       {/* Mobile Top Header */}
       <div className="md:hidden bg-indigo-900 text-white p-4 flex justify-between items-center sticky top-0 z-20">
         <div className="flex items-center gap-2">
@@ -237,24 +236,24 @@ export function AdminApp() {
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            <h2 className="text-3xl font-bold text-slate-900 mb-6">Dashboard Analytics</h2>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">Dashboard Analytics</h2>
             <div className="grid grid-cols-3 gap-6">
-              <Card className="bg-white border-l-4 border-indigo-500">
+              <Card className="glass-card dark:glass-dark border-l-4 border-indigo-500">
                 <CardContent className="p-6">
-                  <p className="text-sm font-medium text-slate-500">Unassigned Orders</p>
-                  <p className="text-3xl font-bold text-slate-900 mt-2">{unassignedOrders.length}</p>
+                  <p className="text-sm font-medium text-slate-500 dark:text-white">Unassigned Orders</p>
+                  <p className="text-3xl font-bold text-slate-900 dark:text-white mt-2">{unassignedOrders.length}</p>
                 </CardContent>
               </Card>
-              <Card className="bg-white border-l-4 border-emerald-500">
+              <Card className="glass-card dark:glass-dark border-l-4 border-emerald-500">
                 <CardContent className="p-6">
-                  <p className="text-sm font-medium text-slate-500">Verified Employees</p>
-                  <p className="text-3xl font-bold text-slate-900 mt-2">{verifiedEmployees.length}</p>
+                  <p className="text-sm font-medium text-slate-500 dark:text-white">Verified Employees</p>
+                  <p className="text-3xl font-bold text-slate-900 dark:text-white mt-2">{verifiedEmployees.length}</p>
                 </CardContent>
               </Card>
-              <Card className="bg-white border-l-4 border-amber-500">
+              <Card className="glass-card dark:glass-dark border-l-4 border-amber-500">
                 <CardContent className="p-6">
-                  <p className="text-sm font-medium text-slate-500">Pending KYC</p>
-                  <p className="text-3xl font-bold text-slate-900 mt-2">{pendingEmployees.length}</p>
+                  <p className="text-sm font-medium text-slate-500 dark:text-white">Pending KYC</p>
+                  <p className="text-3xl font-bold text-slate-900 dark:text-white mt-2">{pendingEmployees.length}</p>
                 </CardContent>
               </Card>
             </div>
@@ -264,45 +263,45 @@ export function AdminApp() {
         {/* ORDER MATCHING TAB */}
         {activeTab === 'matching' && (
           <div className="flex flex-col min-h-[calc(100vh-8rem)]">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6 shrink-0">Employee-Order Matching</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-6 shrink-0">Employee-Order Matching</h2>
             
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">
               
               {/* Unassigned Orders Panel */}
-              <div className="flex flex-col bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden h-[500px] lg:h-full">
-                <div className="p-4 border-b border-slate-100 bg-slate-50">
-                  <h3 className="font-semibold text-slate-900 flex items-center justify-between">
+              <div className="flex flex-col bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl shadow-sm overflow-hidden h-[500px] lg:h-full">
+                <div className="p-4 border-b border-slate-100 dark:border-slate-700/30 bg-slate-50 dark:bg-slate-900/50">
+                  <h3 className="font-semibold text-slate-900 dark:text-white flex items-center justify-between">
                     Unassigned Orders
-                    <span className="bg-slate-200 text-slate-700 px-2.5 py-0.5 rounded-full text-xs">{unassignedOrders.length}</span>
+                    <span className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-white px-2.5 py-0.5 rounded-full text-xs">{unassignedOrders.length}</span>
                   </h3>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                   {unassignedOrders.length === 0 ? (
-                    <div className="text-center text-slate-500 mt-10">No pending orders to assign.</div>
+                    <div className="text-center text-slate-500 dark:text-white mt-10">No pending orders to assign.</div>
                   ) : (
                     unassignedOrders.map((order) => (
-                      <div key={order.id} className="border border-slate-200 rounded-xl p-4 hover:border-indigo-300 transition-colors">
+                      <div key={order.id} className="border border-slate-200 dark:border-slate-700/50 rounded-xl p-4 hover:border-indigo-300 transition-colors">
                         <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-bold text-slate-900">{order.service_device_type}</h4>
+                          <h4 className="font-bold text-slate-900 dark:text-white">{order.service_device_type}</h4>
                           <span className={`px-2 py-1 text-xs font-semibold rounded-md ${order.payment_status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                             {order.payment_status.toUpperCase()}
                           </span>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 mb-4 bg-white p-3 rounded-lg border border-slate-100">
+                        <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 dark:text-white mb-4 bg-white dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700/30">
                           <div><span className="font-semibold text-slate-400 text-[10px] uppercase tracking-wider">Shift</span><br />{order.time_each_day || 'Not specified'}</div>
                           <div><span className="font-semibold text-slate-400 text-[10px] uppercase tracking-wider">Patient Age</span><br />{order.patient_age || 'N/A'}</div>
                           <div><span className="font-semibold text-slate-400 text-[10px] uppercase tracking-wider">Start</span><br />{order.start_date || 'N/A'}</div>
                           <div><span className="font-semibold text-slate-400 text-[10px] uppercase tracking-wider">End</span><br />{order.end_date || 'N/A'}</div>
                           {order.service_details && (
-                            <div className="col-span-2 mt-1 pt-2 border-t border-slate-100">
+                            <div className="col-span-2 mt-1 pt-2 border-t border-slate-100 dark:border-slate-700/30">
                               <span className="font-semibold text-slate-400 text-[10px] uppercase tracking-wider">Details</span><br />
                               <span className="italic text-xs">{order.service_details}</span>
                             </div>
                           )}
                         </div>
                         
-                        <div className="pt-3 border-t border-slate-100">
-                          <p className="text-xs font-medium text-slate-500 mb-2">Available Employees to Assign:</p>
+                        <div className="pt-3 border-t border-slate-100 dark:border-slate-700/30">
+                          <p className="text-xs font-medium text-slate-500 dark:text-white mb-2">Available Employees to Assign:</p>
                           <div className="space-y-2 flex flex-col">
                             {verifiedEmployees.length === 0 ? (
                               <span className="text-xs text-red-500">No verified employees available!</span>
@@ -310,12 +309,12 @@ export function AdminApp() {
                               verifiedEmployees.map(emp => {
                                 const isBusy = allOrders.some(o => o.employee_id === emp.id && o.order_status === 'assigned');
                                 return (
-                                  <div key={emp.id} className={`flex justify-between items-center p-2 rounded-lg border ${isBusy ? 'bg-red-50 border-red-100 opacity-75' : 'bg-slate-50 border-slate-100'}`}>
+                                  <div key={emp.id} className={`flex justify-between items-center p-2 rounded-lg border ${isBusy ? 'bg-red-50 border-red-100 opacity-75' : 'bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-700/30'}`}>
                                     <div>
-                                      <span className="text-sm font-medium text-slate-900 block flex items-center gap-2">
+                                      <span className="text-sm font-medium text-slate-900 dark:text-white block flex items-center gap-2">
                                         {emp.name} {isBusy && <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">Busy</span>}
                                       </span>
-                                      <span className="text-xs text-emerald-600 font-medium capitalize">{emp.shift_preference} Shift</span>
+                                      <span className="text-xs text-emerald-600 dark:text-white font-medium capitalize">{emp.shift_preference} Shift</span>
                                     </div>
                                     <Button size="sm" onClick={() => handleAssign(order.id, emp.id)} disabled={isBusy} className="bg-indigo-600 hover:bg-indigo-700 h-8 text-xs disabled:opacity-50">
                                       Assign
@@ -333,9 +332,9 @@ export function AdminApp() {
               </div>
 
               {/* Available Employees Panel */}
-              <div className="flex flex-col bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden h-[500px] lg:h-full">
-                <div className="p-4 border-b border-slate-100 bg-slate-50">
-                  <h3 className="font-semibold text-slate-900 flex items-center justify-between">
+              <div className="flex flex-col bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl shadow-sm overflow-hidden h-[500px] lg:h-full">
+                <div className="p-4 border-b border-slate-100 dark:border-slate-700/30 bg-slate-50 dark:bg-slate-900/50">
+                  <h3 className="font-semibold text-slate-900 dark:text-white flex items-center justify-between">
                     Available Verified Employees
                     <span className="bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs">{verifiedEmployees.length}</span>
                   </h3>
@@ -344,17 +343,17 @@ export function AdminApp() {
                   {verifiedEmployees.map(emp => {
                     const isBusy = allOrders.some(o => o.employee_id === emp.id && o.order_status === 'assigned');
                     return (
-                      <div key={emp.id} className={`border rounded-xl p-4 ${isBusy ? 'border-red-200 bg-red-50/30' : 'border-slate-200 bg-slate-50'}`}>
+                      <div key={emp.id} className={`border rounded-xl p-4 ${isBusy ? 'border-red-200 bg-red-50/30' : 'border-slate-200 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-900/50'}`}>
                         <div className="flex items-center gap-3 mb-3">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${isBusy ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
                             {emp.name?.charAt(0) || 'E'}
                           </div>
                           <div>
-                            <h4 className="font-bold text-slate-900">{emp.name}</h4>
-                            <p className="text-xs text-slate-500 capitalize">{emp.shift_preference} Shift • {emp.experience}</p>
+                            <h4 className="font-bold text-slate-900 dark:text-white">{emp.name}</h4>
+                            <p className="text-xs text-slate-500 dark:text-white capitalize">{emp.shift_preference} Shift • {emp.experience}</p>
                           </div>
                         </div>
-                        <div className={`text-xs font-medium bg-white border rounded p-2 text-center ${isBusy ? 'text-red-600 border-red-200' : 'text-slate-500 border-slate-200'}`}>
+                        <div className={`text-xs font-medium bg-white dark:bg-slate-800/50 border rounded p-2 text-center ${isBusy ? 'text-red-600 border-red-200' : 'text-slate-500 dark:text-white border-slate-200 dark:border-slate-700/50'}`}>
                           Status: {isBusy ? 'On a Job' : 'Ready for Jobs'}
                         </div>
                       </div>
@@ -370,35 +369,35 @@ export function AdminApp() {
         {/* EMPLOYEE MANAGEMENT (KYC) */}
         {activeTab === 'employees' && (
           <div className="space-y-6">
-            <h2 className="text-3xl font-bold text-slate-900 mb-6">KYC Approvals</h2>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">KYC Approvals</h2>
             {pendingEmployees.length === 0 ? (
-              <div className="p-8 text-center text-slate-500 bg-white rounded-2xl border border-slate-200">
+              <div className="p-8 text-center text-slate-500 dark:text-white bg-white dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700/50">
                 No pending KYC requests at the moment.
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {pendingEmployees.map(emp => (
                   <Card key={emp.id} className="border-amber-200">
-                    <CardHeader className="bg-amber-50 border-b border-amber-100">
+                    <CardHeader className="bg-amber-50 dark:bg-amber-900/30 border-b border-amber-100 dark:border-amber-800/50">
                       <div className="flex justify-between items-center">
-                        <CardTitle className="text-amber-900">{emp.name}</CardTitle>
-                        <span className="bg-amber-200 text-amber-800 text-xs px-2 py-1 rounded font-bold">PENDING</span>
+                        <CardTitle className="text-amber-900 dark:text-amber-100">{emp.name}</CardTitle>
+                        <span className="bg-amber-200 dark:bg-amber-500/30 text-amber-800 dark:text-amber-200 text-xs px-2 py-1 rounded font-bold">PENDING</span>
                       </div>
                     </CardHeader>
                     <CardContent className="p-6 space-y-4">
                       <div>
-                        <p className="text-sm font-medium text-slate-500">Phone</p>
-                        <p className="text-slate-900">{emp.phone_number}</p>
+                        <p className="text-sm font-medium text-slate-500 dark:text-white">Phone</p>
+                        <p className="text-slate-900 dark:text-white">{emp.phone_number}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-slate-500">Experience</p>
-                        <p className="text-slate-900">{emp.experience}</p>
+                        <p className="text-sm font-medium text-slate-500 dark:text-white">Experience</p>
+                        <p className="text-slate-900 dark:text-white">{emp.experience}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-slate-500">KYC Document Reference</p>
-                        <p className="text-slate-900 font-mono bg-slate-100 p-2 rounded mt-1">{emp.kyc_document_details}</p>
+                        <p className="text-sm font-medium text-slate-500 dark:text-white">KYC Document Reference</p>
+                        <p className="text-slate-900 dark:text-white font-mono bg-slate-100 p-2 rounded mt-1">{emp.kyc_document_details}</p>
                       </div>
-                      <div className="flex gap-3 pt-4 border-t border-slate-100">
+                      <div className="flex gap-3 pt-4 border-t border-slate-100 dark:border-slate-700/30">
                         <Button fullWidth className="bg-emerald-600 hover:bg-emerald-700" onClick={() => handleVerifyKyc(emp.id, 'verified')}>
                           Approve KYC
                         </Button>
@@ -417,7 +416,7 @@ export function AdminApp() {
         {/* NOTIFICATIONS TAB */}
         {activeTab === 'notifications' && (
           <div className="space-y-6 max-w-3xl">
-            <h2 className="text-3xl font-bold text-slate-900 mb-6">Global Notification Center</h2>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">Global Notification Center</h2>
             <Card>
               <CardHeader>
                 <CardTitle>Compose Broadcast Message</CardTitle>
@@ -425,9 +424,9 @@ export function AdminApp() {
               <CardContent>
                 <form onSubmit={handleSendNotification} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Target Audience</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-white mb-1.5">Target Audience</label>
                     <select
-                      className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="flex h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       value={notifTarget}
                       onChange={(e) => setNotifTarget(e.target.value)}
                     >
@@ -438,10 +437,10 @@ export function AdminApp() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Notification Title</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-white mb-1.5">Notification Title</label>
                     <input
                       type="text"
-                      className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="flex h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       placeholder="e.g. System Maintenance"
                       value={notifTitle}
                       onChange={(e) => setNotifTitle(e.target.value)}
@@ -449,9 +448,9 @@ export function AdminApp() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Message Body</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-white mb-1.5">Message Body</label>
                     <textarea
-                      className="flex min-h-[120px] w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="flex min-h-[120px] w-full rounded-xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       placeholder="Enter the message content here..."
                       value={notifBody}
                       onChange={(e) => setNotifBody(e.target.value)}
@@ -470,20 +469,20 @@ export function AdminApp() {
         {/* SYSTEM ADMINS TAB */}
         {activeTab === 'system_admins' && (
           <div className="space-y-6 max-w-3xl">
-            <h2 className="text-3xl font-bold text-slate-900 mb-6">System Administrators</h2>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">System Administrators</h2>
             
             {/* Search & Add Admin */}
             <Card className="mb-8">
-              <CardHeader className="bg-indigo-50 border-b border-indigo-100">
-                <CardTitle className="text-indigo-900">Promote User to Admin</CardTitle>
+              <CardHeader className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700/50">
+                <CardTitle className="text-slate-900 dark:text-white">Promote User to Admin</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
                 <form onSubmit={handleSearchUser} className="flex gap-4 items-end mb-4">
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Search by Phone Number</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-white mb-1.5">Search by Phone Number</label>
                     <input
                       type="tel"
-                      className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="flex h-11 w-full rounded-xl border border-slate-300 bg-white dark:bg-slate-800/50 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       placeholder="e.g. 9876543210"
                       value={searchPhone}
                       onChange={(e) => setSearchPhone(e.target.value)}
@@ -498,7 +497,7 @@ export function AdminApp() {
                 {searchResult && (
                   <div className="mt-6 p-4 border border-emerald-200 bg-emerald-50 rounded-xl flex items-center justify-between">
                     <div>
-                      <h4 className="font-bold text-emerald-900">{searchResult.name || 'Unnamed User'}</h4>
+                      <h4 className="font-bold text-slate-900 dark:text-white">{searchResult.name || 'Unnamed User'}</h4>
                       <p className="text-sm text-emerald-700">Phone: {searchResult.phone_number}</p>
                       <p className="text-xs font-medium text-emerald-600 mt-1 uppercase tracking-wide">Current Role: {searchResult.role}</p>
                     </div>
@@ -517,22 +516,22 @@ export function AdminApp() {
             </Card>
 
             {/* List Admins */}
-            <h3 className="text-xl font-bold text-slate-900 mb-4">Current Admins</h3>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Current Admins</h3>
             <div className="grid gap-4">
               {adminUsers.map(admin => (
-                <div key={admin.id} className="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4">
+                <div key={admin.id} className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl p-4 flex items-center gap-4">
                   <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-xl">
                     {admin.name?.charAt(0) || 'A'}
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900">{admin.name || 'Admin'}</h4>
-                    <p className="text-sm text-slate-500">{admin.phone_number}</p>
+                    <h4 className="font-bold text-slate-900 dark:text-white">{admin.name || 'Admin'}</h4>
+                    <p className="text-sm text-slate-500 dark:text-white">{admin.phone_number}</p>
                   </div>
                   <Shield className="w-6 h-6 text-indigo-400 ml-auto" />
                 </div>
               ))}
               {adminUsers.length === 0 && (
-                <p className="text-slate-500 text-center py-8">No admins found.</p>
+                <p className="text-slate-500 dark:text-white text-center py-8">No admins found.</p>
               )}
             </div>
           </div>
@@ -541,20 +540,20 @@ export function AdminApp() {
         {/* DATABASE TAB */}
         {activeTab === 'database' && (
           <div className="space-y-6">
-            <h2 className="text-3xl font-bold text-slate-900 mb-6">Database Management</h2>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">Database Management</h2>
             
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Users Table */}
               <Card className="glass-card overflow-hidden">
-                <CardHeader className="bg-indigo-50/50 border-b border-indigo-100/50 backdrop-blur-md">
-                  <CardTitle className="text-indigo-900 flex items-center gap-2">
+                <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100/50 dark:border-slate-700/50 backdrop-blur-md">
+                  <CardTitle className="text-slate-900 dark:text-white flex items-center gap-2">
                     <Users className="w-5 h-5" />
                     All Users
                   </CardTitle>
                 </CardHeader>
                 <div className="overflow-x-auto max-h-[500px]">
                   <table className="w-full text-sm text-left">
-                    <thead className="text-xs text-slate-500 bg-slate-50/50 sticky top-0 uppercase">
+                    <thead className="text-xs text-slate-500 dark:text-white bg-slate-50 dark:bg-slate-800 sticky top-0 uppercase">
                       <tr>
                         <th className="px-4 py-3">Phone</th>
                         <th className="px-4 py-3">Role</th>
@@ -563,8 +562,8 @@ export function AdminApp() {
                     </thead>
                     <tbody>
                       {allUsers.map((u) => (
-                        <tr key={u.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
-                          <td className="px-4 py-3 font-medium text-slate-900">{u.phone_number}</td>
+                        <tr key={u.id} className="border-b border-slate-100 dark:border-slate-700/30 hover:bg-slate-50 dark:bg-slate-800 transition-colors">
+                          <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{u.phone_number}</td>
                           <td className="px-4 py-3">
                             <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : u.role === 'employee' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
                               {u.role}
@@ -600,15 +599,15 @@ export function AdminApp() {
 
               {/* Orders Table */}
               <Card className="glass-card overflow-hidden">
-                <CardHeader className="bg-emerald-50/50 border-b border-emerald-100/50 backdrop-blur-md">
-                  <CardTitle className="text-emerald-900 flex items-center gap-2">
+                <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100/50 dark:border-slate-700/50 backdrop-blur-md">
+                  <CardTitle className="text-slate-900 dark:text-white flex items-center gap-2">
                     <Inbox className="w-5 h-5" />
                     All Orders
                   </CardTitle>
                 </CardHeader>
                 <div className="overflow-x-auto max-h-[500px]">
                   <table className="w-full text-sm text-left">
-                    <thead className="text-xs text-slate-500 bg-slate-50/50 sticky top-0 uppercase">
+                    <thead className="text-xs text-slate-500 dark:text-white bg-slate-50 dark:bg-slate-800 sticky top-0 uppercase">
                       <tr>
                         <th className="px-4 py-3">Service</th>
                         <th className="px-4 py-3">Status</th>
@@ -617,8 +616,8 @@ export function AdminApp() {
                     </thead>
                     <tbody>
                       {allOrders.map((o) => (
-                        <tr key={o.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
-                          <td className="px-4 py-3 font-medium text-slate-900">{o.service_device_type}</td>
+                        <tr key={o.id} className="border-b border-slate-100 dark:border-slate-700/30 hover:bg-slate-50 dark:bg-slate-800 transition-colors">
+                          <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{o.service_device_type}</td>
                           <td className="px-4 py-3">
                             <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${o.order_status === 'completed' ? 'bg-green-100 text-green-700' : o.order_status === 'assigned' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
                               {o.order_status}
