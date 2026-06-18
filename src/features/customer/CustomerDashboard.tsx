@@ -131,7 +131,7 @@ export function CustomerDashboard({ user }: Props) {
   const handleRazorpayPayment = () => {
     if (!pendingOrder) return;
     const options = {
-      key: "rzp_test_T2DKoMwVosyxaj",
+      key: "rzp_test_T30W1pnw6sZpM8",
       amount: (pendingOrder.locked_price * 100).toString(),
       currency: "INR",
       name: "JanSahayak",
