@@ -480,7 +480,7 @@ export function CustomerDashboard({ user }: Props) {
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm shadow-md transition-all duration-500 ${isCancelled ? 'bg-red-600 text-white ring-4 ring-red-50' : isCompleted ? 'bg-emerald-600 text-white ring-4 ring-emerald-50' : 'bg-white text-slate-400 border-2 border-slate-200'}`}>
                           3
                         </div>
-                        <span className={`text-xs font-bold mt-3 uppercase tracking-wide transition-colors ${isCancelled ? 'text-red-600' : isCompleted ? 'text-slate-800' : 'text-slate-400'}`}>
+                        <span className={`text-xs font-bold mt-3 uppercase tracking-wide transition-colors ${isCancelled ? 'text-red-600' : isCompleted ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
                           {isCancelled ? 'Cancelled' : 'Completed'}
                         </span>
                       </div>

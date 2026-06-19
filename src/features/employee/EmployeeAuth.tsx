@@ -111,8 +111,8 @@ export function EmployeeAuth({ onLogin }: { onLogin: (profile: Profile) => void 
     <div className="flex items-center justify-center min-h-[80vh] p-4 relative animate-fade-in-up transition-colors duration-300">
 
       <Card className="w-full max-w-md glass-card dark:glass-dark relative z-10 border-emerald-100 dark:border-emerald-500/30 shadow-2xl shadow-emerald-900/10 dark:shadow-emerald-900/50 transition-all duration-300">
-        <CardHeader className="pt-8 pb-4 text-center">
-          <div className="w-16 h-16 bg-emerald-50 dark:bg-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 -rotate-3 shadow-inner dark:border dark:border-emerald-500/30">
+        <CardHeader className="pt-6 pb-2 text-center">
+          <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 -rotate-3 shadow-inner dark:border dark:border-emerald-500/30">
             {isRegistering ? (
               <UserPlus className="w-8 h-8 text-emerald-600" />
             ) : (
@@ -122,10 +122,10 @@ export function EmployeeAuth({ onLogin }: { onLogin: (profile: Profile) => void 
           <CardTitle className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             {isRegistering ? 'Join as Employee' : 'Employee Login'}
           </CardTitle>
-          <p className="text-slate-500 dark:text-emerald-200/60 mt-2 font-medium">Employee Portal</p>
+          <p className="text-slate-500 dark:text-white mt-2 font-medium">Employee Portal</p>
         </CardHeader>
-        <CardContent className="p-8">
-          <form onSubmit={step === 'phone' ? handlePhoneSubmit : handleMpinSubmit} className="space-y-5">
+        <CardContent className="p-6">
+          <form onSubmit={step === 'phone' ? handlePhoneSubmit : handleMpinSubmit} className="space-y-4">
             {step === 'phone' ? (
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -134,7 +134,7 @@ export function EmployeeAuth({ onLogin }: { onLogin: (profile: Profile) => void 
                 <input
                   type="tel"
                   placeholder="10-digit mobile number"
-                  className="w-full pl-11 pr-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white dark:placeholder-slate-500"
+                  className="w-full pl-11 pr-4 py-2.5 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white dark:placeholder-slate-500"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                 />
@@ -142,10 +142,10 @@ export function EmployeeAuth({ onLogin }: { onLogin: (profile: Profile) => void 
             ) : (
               <div className="text-center animate-fade-in-up">
                 <div className="mb-4">
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Entering MPIN for <span className="font-bold text-slate-900 dark:text-white">{phone}</span></p>
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-200">Entering MPIN for <span className="font-bold text-slate-900 dark:text-white">{phone}</span></p>
                   <button type="button" onClick={() => { setStep('phone'); setMpin(''); setError(''); }} className="text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Change Number</button>
                 </div>
-                <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex items-center justify-center gap-1">
+                <p className="text-sm font-bold text-slate-500 dark:text-slate-200 uppercase tracking-widest mb-2 flex items-center justify-center gap-1">
                   <Lock className="w-4 h-4" /> Secure MPIN
                 </p>
                 <MpinInput length={4} value={mpin} onChange={setMpin} disabled={isLoading} />
@@ -163,7 +163,7 @@ export function EmployeeAuth({ onLogin }: { onLogin: (profile: Profile) => void 
             </Button>
             
             <div className="text-center mt-6">
-              <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">
+              <p className="text-slate-500 dark:text-slate-200 text-sm mb-2">
                 {isRegistering ? 'Already have an account? ' : "Don't have an account? "}
                 <button
                   type="button"

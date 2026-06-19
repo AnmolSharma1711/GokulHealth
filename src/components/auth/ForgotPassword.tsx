@@ -93,7 +93,7 @@ export function ForgotPassword({ onBack }: Props) {
 
   return (
     <div className="animate-fade-in-up w-full max-w-md mx-auto">
-      <button onClick={onBack} className="flex items-center gap-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white font-medium mb-4 transition-colors">
+      <button onClick={onBack} className="flex items-center gap-2 text-slate-500 hover:text-slate-800 dark:text-slate-200 dark:hover:text-white font-medium mb-4 transition-colors">
         <ArrowLeft className="w-4 h-4" /> Back to Login
       </button>
 
@@ -111,7 +111,7 @@ export function ForgotPassword({ onBack }: Props) {
              step === 3 ? 'Verify OTP' :
              'New MPIN'}
           </CardTitle>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">
+          <p className="text-slate-500 dark:text-slate-200 mt-2 font-medium">
             {step === 1 && 'Enter your registered phone number'}
             {step === 2 && 'Choose recovery method'}
             {step === 3 && 'Enter the verification code'}
@@ -165,7 +165,7 @@ export function ForgotPassword({ onBack }: Props) {
                   </div>
                   <div className="text-left">
                     <div className="font-bold text-slate-900 dark:text-white">Send SMS</div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">to ends in {phone.slice(-4)}</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-200">to ends in {phone.slice(-4)}</div>
                   </div>
                 </div>
               </button>
@@ -181,7 +181,7 @@ export function ForgotPassword({ onBack }: Props) {
                   </div>
                   <div className="text-left">
                     <div className="font-bold text-slate-900 dark:text-white">Send Email</div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">registered email</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-200">registered email</div>
                   </div>
                 </div>
               </button>
@@ -190,7 +190,7 @@ export function ForgotPassword({ onBack }: Props) {
 
           {step === 3 && (
             <form onSubmit={handleVerifyOtp} className="space-y-6 text-center">
-              <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+              <p className="text-sm text-slate-600 dark:text-slate-200 font-medium">
                 Enter the 6-digit code sent via {method.toUpperCase()}
               </p>
               <div className="flex justify-center gap-3">
