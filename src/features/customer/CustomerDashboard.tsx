@@ -253,40 +253,59 @@ export function CustomerDashboard({ user }: Props) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="flex flex-col gap-4">
           {services.map((service) => {
             const isSelected = selectedService === service.id;
             let Icon = Stethoscope;
             if (service.icon === 'ShieldCheck') Icon = ShieldCheck;
             
             return (
-              <button
+              <label
                 key={service.id}
-                onClick={() => setSelectedService(service.id)}
-                className={`p-5 rounded-2xl border text-left transition-all duration-300 flex flex-col items-start relative overflow-hidden ${
+                className={`flex items-center justify-between p-5 rounded-2xl border cursor-pointer transition-all duration-300 ${
                   isSelected 
-                    ? 'border-primary-500 ring-4 ring-primary-500/20 dark:ring-primary-500/40 bg-primary-50 dark:bg-primary-900/30 shadow-lg shadow-primary-900/5 dark:shadow-primary-900/50 -translate-y-1' 
-                    : 'border-white/60 dark:border-slate-700/50 bg-white/40 dark:bg-slate-800/40 backdrop-blur-md hover:border-primary-300 dark:hover:border-primary-500 hover:shadow-md hover:-translate-y-0.5'
+                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30 shadow-md ring-2 ring-primary-500/50' 
+                    : 'border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
-                {isSelected && <div className="absolute inset-0 bg-gradient-to-br from-white/40 dark:from-white/10 to-transparent opacity-50"></div>}
-                <div className={`p-3 rounded-xl mb-4 ${isSelected ? 'bg-primary-100 dark:bg-primary-500/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
-                  <Icon className={`w-6 h-6 ${isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-slate-500 dark:text-slate-400'}`} />
+                <div className="flex items-center gap-4">
+                  <div className={`w-6 h-6 rounded-full border flex items-center justify-center flex-shrink-0 ${isSelected ? 'border-primary-500 bg-primary-500' : 'border-slate-300 dark:border-slate-600'}`}>
+                    {isSelected && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}
+                  </div>
+                  <div className={`p-3 rounded-xl flex-shrink-0 ${isSelected ? 'bg-primary-100 dark:bg-primary-500/20 text-primary-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-slate-900 dark:text-white leading-tight">{service.title}</h3>
+                  </div>
                 </div>
-                <h3 className="font-bold text-sm text-slate-900 dark:text-white leading-tight z-10">{service.title}</h3>
-                <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-2 z-10">
+                <div className="text-xl font-black text-indigo-600 dark:text-indigo-400 text-right">
                   ₹{service.price.toLocaleString()}
-                  <span className="text-sm font-bold text-slate-400 lowercase ml-1">/{service.pricing_type}</span>
+                  <span className="text-sm font-bold text-slate-400 lowercase ml-1">/{service.pricing_type === 'daily' ? 'day' : service.pricing_type === 'hourly' ? 'hour' : service.pricing_type === 'monthly' ? 'month' : service.pricing_type}</span>
                 </div>
-              </button>
+                <input 
+                  type="radio" 
+                  name="service" 
+                  className="hidden" 
+                  checked={isSelected} 
+                  onChange={() => setSelectedService(service.id)} 
+                />
+              </label>
             );
           })}
         </div>
 
         {selectedService && activeService && (
-          <Card className="glass-card dark:glass-dark border-primary-100 dark:border-primary-500/30 rounded-3xl overflow-hidden mt-8 animate-fade-in-up">
-            <CardContent className="p-1">
-              <div className="grid md:grid-cols-2 gap-0 bg-gradient-to-br from-white/60 dark:from-slate-800/40 to-slate-50/60 dark:to-slate-900/40 rounded-3xl overflow-hidden">
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto glass-card dark:glass-dark border-primary-100 dark:border-primary-500/30 rounded-3xl relative shadow-2xl animate-fade-in-up">
+              <button 
+                onClick={() => setSelectedService(null)} 
+                className="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center bg-white/50 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-500 transition-colors"
+              >
+                ✕
+              </button>
+              <CardContent className="p-1">
+                <div className="grid md:grid-cols-2 gap-0 bg-gradient-to-br from-white/60 dark:from-slate-800/40 to-slate-50/60 dark:to-slate-900/40 rounded-3xl overflow-hidden">
                 <div className="p-8">
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                     <Clock className="w-5 h-5 text-primary-500 dark:text-primary-400" />
@@ -360,6 +379,7 @@ export function CustomerDashboard({ user }: Props) {
               </div>
             </CardContent>
           </Card>
+          </div>
         )}
       </div>
     );

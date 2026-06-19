@@ -64,6 +64,24 @@ export class RealDatabase {
     return data.publicUrl;
   }
 
+  // --- OTP Auth ---
+  async sendPhoneOtp(phone: string): Promise<void> {
+    const { error } = await supabase.auth.signInWithOtp({
+      phone: `+91${phone}`, // Assumes Indian phone number by default, customize as needed
+    });
+    if (error) throw new Error(error.message);
+  }
+
+  async verifyPhoneOtp(phone: string, token: string): Promise<any> {
+    const { data, error } = await supabase.auth.verifyOtp({
+      phone: `+91${phone}`,
+      token,
+      type: 'sms',
+    });
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
   // --- Customer ---
   async getCustomerDetails(id: string): Promise<CustomerDetails | null> {
     const { data, error } = await supabase.from('customer_details').select('*').eq('id', id).single();

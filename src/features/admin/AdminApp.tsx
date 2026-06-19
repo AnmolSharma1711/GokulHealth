@@ -697,7 +697,7 @@ export function AdminApp() {
                   <CardContent className="p-6 flex justify-between items-center">
                     <div>
                       <h4 className="font-bold text-xl text-slate-900 dark:text-white">{s.title}</h4>
-                      <p className="text-slate-500 font-medium mt-1">₹{s.price} / {s.pricing_type}</p>
+                      <p className="text-slate-500 font-medium mt-1">₹{s.price} / {s.pricing_type === 'daily' ? 'day' : s.pricing_type === 'hourly' ? 'hour' : s.pricing_type === 'monthly' ? 'month' : s.pricing_type}</p>
                     </div>
                     <div className="flex gap-2">
                       <button onClick={() => setEditingService(s)} className="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors font-bold uppercase text-xs">

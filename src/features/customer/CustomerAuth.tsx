@@ -12,12 +12,13 @@ import { ForgotPassword } from '../../components/auth/ForgotPassword';
 export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void }) {
   const [phone, setPhone] = useState('');
   const [mpin, setMpin] = useState('');
+  const [step, setStep] = useState<'phone' | 'mpin'>('phone');
   const [isRegistering, setIsRegistering] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
@@ -25,6 +26,36 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
       setError('Phone number must be 10 digits');
       return;
     }
+
+    setIsLoading(true);
+    try {
+      const existingUser = await db.searchUserByPhone(phone);
+      if (isRegistering) {
+        if (existingUser) {
+          setError('An account with this phone number already exists.');
+        } else {
+          setStep('mpin');
+        }
+      } else {
+        if (!existingUser) {
+          setError('Account not found. Please create an account.');
+        } else if (existingUser.role !== 'customer') {
+          setError('This account is not a customer account');
+        } else {
+          setStep('mpin');
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMpinSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    
     if (mpin.length !== 4) {
       setError('MPIN must be 4 digits');
       return;
@@ -59,7 +90,7 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
           }
           onLogin(profile);
         } else {
-          setError('Invalid phone number or MPIN');
+          setError('Invalid MPIN');
         }
       }
     } catch (err: any) {
@@ -95,26 +126,32 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
           <p className="text-slate-500 dark:text-primary-200/60 mt-2 font-medium">Customer Portal</p>
         </CardHeader>
         <CardContent className="p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Phone className="h-5 w-5 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+          <form onSubmit={step === 'phone' ? handlePhoneSubmit : handleMpinSubmit} className="space-y-5">
+            {step === 'phone' ? (
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Phone className="h-5 w-5 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+                </div>
+                <input
+                  type="tel"
+                  placeholder="10-digit mobile number"
+                  className="w-full pl-11 pr-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all font-medium text-slate-900 dark:text-white dark:placeholder-slate-500"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                />
               </div>
-              <input
-                type="tel"
-                placeholder="10-digit mobile number"
-                className="w-full pl-11 pr-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all font-medium text-slate-900 dark:text-white dark:placeholder-slate-500"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-              />
-            </div>
-            
-            <div className="text-center">
-              <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center justify-center gap-1">
-                <Lock className="w-4 h-4" /> Secure MPIN
-              </p>
-              <MpinInput length={4} value={mpin} onChange={setMpin} disabled={isLoading} />
-            </div>
+            ) : (
+              <div className="text-center animate-fade-in-up">
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Entering MPIN for <span className="font-bold text-slate-900 dark:text-white">{phone}</span></p>
+                  <button type="button" onClick={() => { setStep('phone'); setMpin(''); setError(''); }} className="text-xs text-primary-600 dark:text-primary-400 font-bold hover:underline">Change Number</button>
+                </div>
+                <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex items-center justify-center gap-1">
+                  <Lock className="w-4 h-4" /> Secure MPIN
+                </p>
+                <MpinInput length={4} value={mpin} onChange={setMpin} disabled={isLoading} />
+              </div>
+            )}
             
             {error && (
               <div className="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-sm p-3 rounded-lg border border-red-100 dark:border-red-500/20 font-medium text-center">
@@ -123,7 +160,7 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
             )}
 
             <Button type="submit" fullWidth className="bg-primary-600 hover:bg-primary-700 shadow-lg shadow-primary-600/20 py-6 text-lg mt-4" disabled={isLoading}>
-              {isLoading ? 'Processing...' : isRegistering ? 'Register Securely' : 'Login Securely'}
+              {isLoading ? 'Processing...' : step === 'phone' ? 'Continue' : isRegistering ? 'Register Securely' : 'Login Securely'}
             </Button>
             
             <div className="text-center mt-6">
@@ -134,6 +171,8 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
                   onClick={() => {
                     setIsRegistering(!isRegistering);
                     setError('');
+                    setStep('phone');
+                    setMpin('');
                   }}
                   className="text-primary-600 dark:text-primary-400 font-bold hover:underline transition-all"
                 >

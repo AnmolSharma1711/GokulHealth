@@ -32,12 +32,25 @@ export function ForgotPassword({ onBack }: Props) {
     setStep(2);
   };
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (otp.length !== 6) return setError('Enter 6-digit OTP');
-    // Simulate OTP success (any 6 digits works)
-    setStep(4);
+    
+    setIsLoading(true);
+    try {
+      if (method === 'sms') {
+        await db.verifyPhoneOtp(phone, otp);
+      } else {
+        // Mock email OTP for now
+        if (otp !== '123456') throw new Error('Invalid code');
+      }
+      setStep(4);
+    } catch (err: any) {
+      setError(err.message || 'Invalid OTP');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleOtpChange = (index: number, value: string) => {
@@ -131,7 +144,19 @@ export function ForgotPassword({ onBack }: Props) {
             <div className="space-y-4">
               <button
                 type="button"
-                onClick={() => { setMethod('sms'); setStep(3); }}
+                onClick={async () => { 
+                  setMethod('sms'); 
+                  setError('');
+                  setIsLoading(true);
+                  try {
+                    await db.sendPhoneOtp(phone);
+                    setStep(3); 
+                  } catch(err: any) {
+                    setError(err.message || 'Failed to send SMS');
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
                 className="w-full flex items-center justify-between p-4 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-primary-500 dark:hover:border-primary-500 transition-all group"
               >
                 <div className="flex items-center gap-3">
@@ -144,6 +169,7 @@ export function ForgotPassword({ onBack }: Props) {
                   </div>
                 </div>
               </button>
+              {error && <div className="text-red-500 dark:text-red-400 text-sm font-medium text-center mt-4">{error}</div>}
               <button
                 type="button"
                 onClick={() => { setMethod('email'); setStep(3); }}
@@ -182,8 +208,8 @@ export function ForgotPassword({ onBack }: Props) {
                 ))}
               </div>
               {error && <div className="text-red-500 dark:text-red-400 text-sm font-medium text-center">{error}</div>}
-              <Button type="submit" fullWidth className="bg-primary-600 hover:bg-primary-700 py-4 text-white">
-                Verify Code
+              <Button type="submit" fullWidth className="bg-primary-600 hover:bg-primary-700 py-4 text-white" disabled={isLoading}>
+                {isLoading ? 'Verifying...' : 'Verify Code'}
               </Button>
             </form>
           )}
