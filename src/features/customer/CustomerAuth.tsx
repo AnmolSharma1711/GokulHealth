@@ -5,11 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/commo
 import { db } from '../../store/MockDatabase';
 import { Profile } from '../../types/database';
 import { hashMpin } from '../../utils/crypto';
-import { Lock, Phone, UserPlus, LogIn } from 'lucide-react';
+import { Lock, Phone, UserPlus, LogIn, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { MpinInput } from '../../components/common/MpinInput';
 import { ForgotPassword } from '../../components/auth/ForgotPassword';
 
 export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void }) {
+  const navigate = useNavigate();
   const [phone, setPhone] = useState('');
   const [mpin, setMpin] = useState('');
   const [step, setStep] = useState<'phone' | 'mpin'>('phone');
@@ -111,7 +113,7 @@ export function CustomerAuth({ onLogin }: { onLogin: (profile: Profile) => void 
   return (
     <div className="flex items-center justify-center min-h-[80vh] p-4 relative animate-fade-in-up transition-colors duration-300">
 
-      <Card className="w-full max-w-md glass-card dark:glass-dark relative z-10 border-primary-100 dark:border-primary-500/30 shadow-2xl shadow-primary-900/10 dark:shadow-primary-900/50 transition-all duration-300">
+      <Card className="w-full max-w-md glass-card dark:glass-dark relative z-10 border-primary-100 dark:border-primary-500/30 shadow-2xl shadow-primary-900/10 dark:shadow-primary-900/50 transition-all duration-300">`n        <button onClick={() => navigate('/')} className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white bg-slate-100 dark:bg-slate-800/50 rounded-full transition-colors z-20"><X className="w-5 h-5" /></button>
         <CardHeader className="pt-6 pb-2 text-center">
           <div className="w-12 h-12 bg-primary-50 dark:bg-primary-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 rotate-3 shadow-inner dark:border dark:border-primary-500/30">
             {isRegistering ? (

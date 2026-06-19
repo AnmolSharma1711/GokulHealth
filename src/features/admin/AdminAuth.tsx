@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Shield, Lock, Phone } from 'lucide-react';
+import { Shield, Lock, Phone, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Profile } from '../../types/database';
 import { db } from '../../store/MockDatabase';
 import { hashMpin } from '../../utils/crypto';
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function AdminAuth({ onLogin }: Props) {
+  const navigate = useNavigate();
   const [phone, setPhone] = useState('');
   const [mpin, setMpin] = useState('');
   const [step, setStep] = useState<'phone' | 'mpin'>('phone');
@@ -87,6 +89,12 @@ export function AdminAuth({ onLogin }: Props) {
   return (
     <div className="flex items-center justify-center min-h-screen p-4 relative animate-fade-in-up transition-colors duration-300">
       <Card className="w-full max-w-md glass-card dark:glass-dark relative z-10 border-indigo-100 dark:border-indigo-500/30 shadow-2xl shadow-indigo-900/10 dark:shadow-indigo-900/50 transition-all duration-300">
+        <button 
+          onClick={() => navigate('/')} 
+          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white bg-slate-100 dark:bg-slate-800/50 rounded-full transition-colors z-20"
+        >
+          <X className="w-5 h-5" />
+        </button>
         <CardHeader className="pt-6 pb-2 text-center">
           <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner border border-indigo-100 dark:border-indigo-500/30">
             <Shield className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
