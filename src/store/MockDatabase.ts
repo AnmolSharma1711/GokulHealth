@@ -215,7 +215,7 @@ export class RealDatabase {
     const { data, error } = await supabase
       .from('notifications')
       .select('*')
-      .or(`target_role.eq.all,target_role.eq.${role},target_user_id.eq.${userId}`)
+      .or(`target_role.eq.all,and(target_user_id.is.null,target_role.eq.${role}),target_user_id.eq.${userId}`)
       .order('created_at', { ascending: false });
     
     if (error) return [];
