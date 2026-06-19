@@ -30,6 +30,7 @@ A comprehensive platform designed to seamlessly connect customers with professio
 ## Technology Stack
 
 - **Frontend:** React, TypeScript, Vite
+- **Mobile App Builder:** Capacitor (iOS & Android compilation)
 - **Styling:** Tailwind CSS (with custom Glassmorphism and dark mode support)
 - **Icons:** Lucide React
 - **Backend/Database:** Supabase (PostgreSQL, Auth, Storage)
@@ -57,9 +58,21 @@ A comprehensive platform designed to seamlessly connect customers with professio
 4. **Twilio SMS Configuration (Optional but Recommended):**
    To enable real-time SMS OTPs for MPIN recovery, link your Twilio Account SID and Auth Token inside your Supabase Dashboard under `Authentication -> Providers -> Phone`.
 
-5. **Run the Development Server:**
+5. **Run the Web Development Server:**
    ```bash
    npm run dev
+   ```
+
+6. **Build for Mobile (Android & iOS):**
+   This project uses **Capacitor** to wrap the web app into native mobile applications.
+   ```bash
+   npm run build
+   npx cap sync
+   ```
+   To open the native IDEs:
+   ```bash
+   npx cap open android
+   npx cap open ios
    ```
 
 ## Contributing
