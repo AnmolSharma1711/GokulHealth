@@ -1,4 +1,4 @@
-import { User, Briefcase, Shield, ArrowRight } from 'lucide-react';
+import { User, Briefcase, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function LandingPage() {
