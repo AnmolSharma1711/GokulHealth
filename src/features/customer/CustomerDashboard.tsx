@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useRazorpay } from "react-razorpay";
 import { Profile, CustomerDetails, Order, Service } from '../../types/database';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
@@ -16,7 +15,6 @@ interface Props {
 
 export function CustomerDashboard({ user }: Props) {
   const [currentTab, setCurrentTab] = useState<'book' | 'orders' | 'profile'>('book');
-  const { Razorpay } = useRazorpay();
   
   // Booking State
   const [selectedService, setSelectedService] = useState<string | null>(null);
