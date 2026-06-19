@@ -172,7 +172,7 @@ export function CustomerDashboard({ user }: Props) {
     if (!pendingOrder) return;
     const options = {
       key: "rzp_test_T30W1pnw6sZpM8",
-      amount: (pendingOrder.locked_price * 100).toString(),
+      amount: Math.round(pendingOrder.locked_price * 100).toString(),
       currency: "INR",
       name: "JanSahayak",
       description: `Payment for ${pendingOrder.service_device_type}`,
@@ -192,8 +192,9 @@ export function CustomerDashboard({ user }: Props) {
         alert(`Payment Failed: ${response.error.description}`);
       });
       rzp.open();
-    } catch (err) {
-      alert("Failed to initialize Razorpay. Ensure you are connected to the internet.");
+    } catch (err: any) {
+      alert(`Failed to initialize Razorpay: ${err?.message || err}`);
+      console.error('Razorpay Error:', err);
     }
   };
 
@@ -225,7 +226,7 @@ export function CustomerDashboard({ user }: Props) {
                 fullWidth 
                 variant="outline" 
                 className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 py-6 text-lg group"
-                onClick={() => handleSuccessPayment("TEST_BYPASS_" + crypto.randomUUID().substring(0,8))}
+                onClick={() => handleSuccessPayment("TEST_BYPASS_" + Math.random().toString(36).substring(2, 10).toUpperCase())}
               >
                 <Zap className="w-5 h-5 mr-2 group-hover:text-emerald-500 transition-colors" />
                 Simulate Payment (Test Mode)
