@@ -387,8 +387,8 @@ export function CustomerDashboard({ user }: Props) {
           <div className="w-24 h-24 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
             <ClipboardList className="w-10 h-10 text-primary-400" />
           </div>
-          <h3 className="text-2xl font-black text-slate-900 mb-3">No active orders</h3>
-          <p className="text-slate-500 max-w-md mx-auto text-lg">You haven't booked any services or devices yet. Head over to the Book tab to get started.</p>
+          <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">No active orders</h3>
+          <p className="text-slate-500 dark:text-slate-200 max-w-md mx-auto text-lg">You haven't booked any services or devices yet. Head over to the Book tab to get started.</p>
           <Button size="lg" className="mt-8 bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20" onClick={() => setCurrentTab('book')}>Book a Service</Button>
         </div>
       );
@@ -398,8 +398,8 @@ export function CustomerDashboard({ user }: Props) {
       <div className="space-y-8 animate-fade-in-up">
         <div className="glass p-6 rounded-3xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse-slow"></div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">My Orders</h2>
-          <p className="text-slate-500 mt-2 text-lg">Track the real-time status of your requested services.</p>
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">My Orders</h2>
+          <p className="text-slate-500 dark:text-slate-200 mt-2 text-lg">Track the real-time status of your requested services.</p>
         </div>
 
         <div className="grid grid-cols-1 gap-6">
@@ -413,8 +413,8 @@ export function CustomerDashboard({ user }: Props) {
                 <CardContent className="p-6 md:p-8">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
-                      <h3 className="font-bold text-2xl text-slate-900 tracking-tight">{order.service_device_type}</h3>
-                      <p className="text-slate-500 mt-1 font-medium">Duration: {formatDuration(order.start_date, order.end_date, order.duration_months)} • Total: <span className="text-slate-900 font-bold">₹{order.locked_price.toLocaleString()}</span></p>
+                      <h3 className="font-bold text-2xl text-slate-900 dark:text-white tracking-tight">{order.service_device_type}</h3>
+                      <p className="text-slate-500 dark:text-slate-200 mt-1 font-medium">Duration: {formatDuration(order.start_date, order.end_date, order.duration_months)} • Total: <span className="text-slate-900 dark:text-white font-bold">₹{order.locked_price.toLocaleString()}</span></p>
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm ${
@@ -466,14 +466,14 @@ export function CustomerDashboard({ user }: Props) {
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm shadow-md transition-all duration-300 ${'bg-indigo-600 text-white ring-4 ring-indigo-50'}`}>
                           1
                         </div>
-                        <span className="text-xs font-bold mt-3 text-slate-800 uppercase tracking-wide">Requested</span>
+                        <span className="text-xs font-bold mt-3 text-slate-800 dark:text-white uppercase tracking-wide">Requested</span>
                       </div>
                       
                       <div className="flex flex-col items-center">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm shadow-md transition-all duration-500 ${isAssigned ? 'bg-blue-600 text-white ring-4 ring-blue-50' : 'bg-white text-slate-400 border-2 border-slate-200'}`}>
                           2
                         </div>
-                        <span className={`text-xs font-bold mt-3 uppercase tracking-wide transition-colors ${isAssigned ? 'text-slate-800' : 'text-slate-400'}`}>Assigned</span>
+                        <span className={`text-xs font-bold mt-3 uppercase tracking-wide transition-colors ${isAssigned ? 'text-slate-800 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>Assigned</span>
                       </div>
 
                       <div className="flex flex-col items-center">
