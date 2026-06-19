@@ -260,37 +260,28 @@ export function CustomerDashboard({ user }: Props) {
             if (service.icon === 'ShieldCheck') Icon = ShieldCheck;
             
             return (
-              <label
+              <button
                 key={service.id}
-                className={`flex items-center justify-between p-5 rounded-2xl border cursor-pointer transition-all duration-300 ${
+                onClick={() => setSelectedService(service.id)}
+                className={`flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border transition-all duration-300 text-left w-full ${
                   isSelected 
                     ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30 shadow-md ring-2 ring-primary-500/50' 
                     : 'border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
-                <div className="flex items-center gap-4">
-                  <div className={`w-6 h-6 rounded-full border flex items-center justify-center flex-shrink-0 ${isSelected ? 'border-primary-500 bg-primary-500' : 'border-slate-300 dark:border-slate-600'}`}>
-                    {isSelected && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}
-                  </div>
+                <div className="flex items-center gap-4 mb-2 sm:mb-0">
                   <div className={`p-3 rounded-xl flex-shrink-0 ${isSelected ? 'bg-primary-100 dark:bg-primary-500/20 text-primary-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
                     <Icon className="w-6 h-6" />
                   </div>
-                  <div>
-                    <h3 className="font-bold text-lg text-slate-900 dark:text-white leading-tight">{service.title}</h3>
+                  <div className="flex-grow min-w-0">
+                    <h3 className="font-bold text-lg text-slate-900 dark:text-white leading-tight break-words">{service.title}</h3>
                   </div>
                 </div>
-                <div className="text-xl font-black text-indigo-600 dark:text-indigo-400 text-right">
+                <div className="text-xl font-black text-indigo-600 dark:text-indigo-400 sm:text-right mt-1 sm:mt-0 ml-[60px] sm:ml-0 flex-shrink-0">
                   ₹{service.price.toLocaleString()}
                   <span className="text-sm font-bold text-slate-400 lowercase ml-1">/{service.pricing_type === 'daily' ? 'day' : service.pricing_type === 'hourly' ? 'hour' : service.pricing_type === 'monthly' ? 'month' : service.pricing_type}</span>
                 </div>
-                <input 
-                  type="radio" 
-                  name="service" 
-                  className="hidden" 
-                  checked={isSelected} 
-                  onChange={() => setSelectedService(service.id)} 
-                />
-              </label>
+              </button>
             );
           })}
         </div>
